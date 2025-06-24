@@ -105,6 +105,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<link href="site_libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+
+<link href="site_libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
+
+<script src="site_libs/datatables-binding-0.33/datatables.js"></script>
+
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+
+<link href="site_libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
+
+<link href="site_libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet">
+
+<script src="site_libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+
+<link href="site_libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet">
+
+<script src="site_libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
+
 
 
 <link rel="stylesheet" href="styles.css">
@@ -190,8 +210,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#usando-datos-reales" id="toc-usando-datos-reales" class="nav-link active" data-scroll-target="#usando-datos-reales">Usando datos reales</a>
   <ul class="collapse">
-  <li><a href="#modelando-la-ocupacion-de-un-venado-andino" id="toc-modelando-la-ocupacion-de-un-venado-andino" class="nav-link" data-scroll-target="#modelando-la-ocupacion-de-un-venado-andino">Modelando la ocupacion de un venado andino</a></li>
+  <li><a href="#modelando-la-ocupacion-de-un-venado-andino" id="toc-modelando-la-ocupacion-de-un-venado-andino" class="nav-link" data-scroll-target="#modelando-la-ocupacion-de-un-venado-andino">Modelando la ocupacion de un venado andino</a>
+  <ul class="collapse">
+  <li><a href="#cargar-los-datos" id="toc-cargar-los-datos" class="nav-link" data-scroll-target="#cargar-los-datos">Cargar los datos</a></li>
+  <li><a href="#veamos-los-datos" id="toc-veamos-los-datos" class="nav-link" data-scroll-target="#veamos-los-datos">Veamos los datos</a></li>
+  <li><a href="#obtención-de-covariables" id="toc-obtención-de-covariables" class="nav-link" data-scroll-target="#obtención-de-covariables">Obtención de covariables</a></li>
   </ul></li>
+  </ul></li>
+  <li><a href="#extraer-covariables" id="toc-extraer-covariables" class="nav-link" data-scroll-target="#extraer-covariables">Extraer covariables</a></li>
+  <li><a href="#occupancy" id="toc-occupancy" class="nav-link" data-scroll-target="#occupancy">Occupancy</a></li>
   <li><a href="#conclusión" id="toc-conclusión" class="nav-link" data-scroll-target="#conclusión">Conclusión</a>
   <ul class="collapse">
   <li><a href="#obtenga-ayuda" id="toc-obtenga-ayuda" class="nav-link" data-scroll-target="#obtenga-ayuda">Obtenga ayuda</a></li>
@@ -242,25 +269,160 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="usando-datos-reales" class="level1">
 <h1>Usando datos reales</h1>
+<div class="callout callout-style-default callout-tip callout-titled" title="Los datos que vamos a usar provienen del articulo:">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Los datos que vamos a usar provienen del articulo:
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Elevation as an occupancy determinant of the little red brocket deer (<em>Mazama rufina</em>) in the Central Andes of Colombia. <a href="https://doi.org/10.15446/caldasia.v43n2.85449">https://doi.org/10.15446/caldasia.v43n2.85449</a></p>
+</div>
+</div>
 <section id="modelando-la-ocupacion-de-un-venado-andino" class="level2">
 <h2 class="anchored" data-anchor-id="modelando-la-ocupacion-de-un-venado-andino">Modelando la ocupacion de un venado andino</h2>
-<p>Comenzamos cargando tres paquetes básicos necesarios para generar nuestros primeros mapas; <code>mapview</code>, <code>sf</code> y <code>unmarked</code>.</p>
+<p>Acá evaluamos la influencia de variables del terreno sobre la ocupación del venado soche (<em>Mazama rufina</em>) en los Andes centrales de Colombia. La ocupación aumentó con la elevación hasta los 3000 m y por encima de este valor decrece. Esta información es crucial para predecir los posibles efectos del cambio climático sobre <em>M. rufina</em> y otras especies de montaña.</p>
+<p>Comenzamos cargando tres paquetes básicos necesarios para generar mapas; <code>mapview</code>, <code>sf</code> y luego <code>readr</code> para leer los datos y <code>unmarked</code> para los modelos de ocupación.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mapview)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(unmarked)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr) <span class="co"># read csv</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DT) <span class="co"># tablas en html</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(unmarked)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(terra)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(elevatr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>El paquete sf se utiliza para trabajar con datos espaciales y ofrece funciones para leer, escribir y analizar datos espaciales (features en inglés) de una manera sencilla y eficiente.</p>
+<p>El paquete sf se utiliza para trabajar con datos espaciales y ofrece funciones para leer, escribir y analizar datos espaciales (features en inglés) de una manera sencilla y eficiente. Mapview nos permite visualizar mapas rapidamente en R.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(maps)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
+<section id="cargar-los-datos" class="level3">
+<h3 class="anchored" data-anchor-id="cargar-los-datos">Cargar los datos</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># read photo data in object y_full. Columns are days and rows sites</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># load("data/y_full.RData") # if you got the repo in hard disk</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>ydata <span class="ot">&lt;-</span> <span class="st">"https://github.com/dlizcano/Mazama_rufina/blob/main/data/y_full.RData?raw=true"</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="fu">url</span>(ydata))</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># read camera location</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># cams_loc_QR &lt;- read.csv("data/cams_location.csv") # if you got the repo in hard disk</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>camdata <span class="ot">&lt;-</span> <span class="st">"https://raw.githubusercontent.com/dlizcano/Mazama_rufina/main/data/cams_location.csv"</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>cams_loc_QR <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="fu">url</span>(camdata))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 </section>
+<section id="veamos-los-datos" class="level3">
+<h3 class="anchored" data-anchor-id="veamos-los-datos">Veamos los datos</h3>
+<p>En las columnas de <code>y_full</code> tenemos los dias de muestreo y en las filas cada uno de los sitios donde se instaló una camara trampa.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(y_full)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>En la tabla <code>cams_loc_QR</code> tenemos las coordenadas de cada camara.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(cams_loc_QR)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="obtención-de-covariables" class="level3">
+<h3 class="anchored" data-anchor-id="obtención-de-covariables">Obtención de covariables</h3>
+<p>Ahora vamos a usar las coordenadas de cada camara para obtener la elevación, la pendiente y el aspecto.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># convert to sf</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>cams_loc_QR_sf <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(cams_loc_QR, <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"Longitud"</span>, <span class="st">"Latitud"</span>), <span class="at">crs =</span> <span class="st">"+proj=longlat +datum=WGS84 +no_defs"</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># convert to UTM</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>cams_loc_QR_sf_utm <span class="ot">&lt;-</span> <span class="fu">st_transform</span>(cams_loc_QR_sf, <span class="st">"EPSG:32618"</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>centroid <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">mean</span>(cams_loc_QR<span class="sc">$</span>Longitud), <span class="fu">mean</span>(cams_loc_QR<span class="sc">$</span>Latitud))</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co"># clip_window &lt;- ext(-75.60 , -75.39, 4.59, 4.81) # extent</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co"># bb &lt;- c(-75.60, 4.59, -75.39,  4.81)</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># get spatial data as spatrast</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>srtm <span class="ot">&lt;-</span> <span class="fu">rast</span>(<span class="fu">get_elev_raster</span>(cams_loc_QR_sf_utm, <span class="at">z=</span><span class="dv">9</span>))</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co"># crop the  raster using the vector extent</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>srtm_crop <span class="ot">&lt;-</span> srtm <span class="co">#terra::crop(srtm, clip_window)</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co"># elevation.crop and terrain covs</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>elevation <span class="ot">&lt;-</span> srtm_crop</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>slope<span class="ot">&lt;-</span><span class="fu">terrain</span>(srtm_crop, <span class="st">"slope"</span>, <span class="at">unit=</span><span class="st">'degrees'</span>, <span class="at">neighbors=</span><span class="dv">8</span>)</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>aspect<span class="ot">&lt;-</span><span class="fu">terrain</span>(srtm_crop, <span class="st">"aspect"</span>, <span class="at">unit=</span><span class="st">'degrees'</span>, <span class="at">neighbors=</span><span class="dv">8</span>)</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>roughness <span class="ot">&lt;-</span> <span class="fu">terrain</span>(srtm_crop, <span class="st">"roughness"</span>, <span class="at">neighbors=</span><span class="dv">8</span>)</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>cov.list<span class="ot">&lt;-</span><span class="fu">list</span>(elevation, slope, aspect, roughness)</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>cov.stack<span class="ot">&lt;-</span><span class="fu">rast</span>(cov.list)</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(cov.stack) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"elevation"</span>, <span class="st">"slope"</span>, <span class="st">"aspect"</span>, <span class="st">"roughness"</span> )</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(cov.stack)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="parte2_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="extraer-covariables" class="level1">
+<h1>Extraer covariables</h1>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># extract covariates</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>cam_covs <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">extract</span> (cov.stack, cams_loc_QR_sf_utm)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>full_covs <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(cam_covs) <span class="co"># convert to Data frame</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>full_covs_1 <span class="ot">&lt;-</span> <span class="fu">scale</span>(full_covs)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>full_covs_s <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(full_covs_1)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>full_covs_s<span class="sc">$</span>camara <span class="ot">&lt;-</span> cams_loc_QR<span class="sc">$</span>camara <span class="co"># add camera name</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="fu">datatable</span>(full_covs_s)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-82c32b45b8fd8e0456ae" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-82c32b45b8fd8e0456ae">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57","58","59","60","61","62","63","64","65","66","67","68","69","70","71","72","73","74","75","76","77","78","79","80","81","82","83","84","85","86","87"],[-1.702386302299526,-1.662795923176281,-1.623205544053036,-1.583615164929792,-1.544024785806547,-1.504434406683302,-1.464844027560057,-1.425253648436812,-1.385663269313568,-1.346072890190323,-1.306482511067078,-1.266892131943833,-1.227301752820589,-1.187711373697344,-1.148120994574099,-1.108530615450854,-1.068940236327609,-1.029349857204364,-0.9897594780811197,-0.9501690989578749,-0.9105787198346301,-0.8709883407113854,-0.8313979615881406,-0.7918075824648958,-0.752217203341651,-0.7126268242184062,-0.6730364450951615,-0.6334460659719167,-0.5938556868486718,-0.554265307725427,-0.5146749286021822,-0.4750845494789375,-0.4354941703556927,-0.3959037912324479,-0.3563134121092031,-0.3167230329859583,-0.2771326538627135,-0.2375422747394687,-0.1979518956162239,-0.1583615164929792,-0.1187711373697344,-0.07918075824648958,-0.03959037912324479,0,0.03959037912324479,0.07918075824648958,0.1187711373697344,0.1583615164929792,0.1979518956162239,0.2375422747394687,0.2771326538627135,0.3167230329859583,0.3563134121092031,0.3959037912324479,0.4354941703556927,0.4750845494789375,0.5146749286021822,0.554265307725427,0.5938556868486718,0.6334460659719167,0.6730364450951615,0.7126268242184062,0.752217203341651,0.7918075824648958,0.8313979615881406,0.8709883407113854,0.9105787198346301,0.9501690989578749,0.9897594780811197,1.029349857204364,1.068940236327609,1.108530615450854,1.148120994574099,1.187711373697344,1.227301752820589,1.266892131943833,1.306482511067078,1.346072890190323,1.385663269313568,1.425253648436812,1.464844027560057,1.504434406683302,1.544024785806547,1.583615164929792,1.623205544053036,1.662795923176281,1.702386302299526],[-0.8860548516969368,-0.9628388341280025,-0.629625325464887,-0.3398744483665258,-0.435492237808985,-0.4123121676411161,-0.189203992275378,-0.8498359920596417,-0.3297331676680831,-0.771603255243084,-0.742628167533248,-0.809270869265871,-0.8136171324223465,-0.9889164130668551,-0.9758776235974288,-0.7991295885674284,-1.132343097230544,-1.091777974436773,-0.8078221148803792,-0.9469025358875927,-0.3413232027520176,-0.794783325410953,-0.8860548516969368,-0.6209327991519362,-0.6817804833425921,-0.6832292377280839,-0.5484950798773459,-0.555738851804805,-0.9671850972844779,-0.9628388341280025,-0.4412872553509523,-0.7440769219187398,-0.7831932903270186,-1.016442746391199,-0.9570438165860353,-0.780295781556035,-0.6470103780907888,-0.5238662553239852,-0.6412153605488216,-0.6542541500182478,-0.5673288868887394,-0.1747164484204599,0.06867428834216356,0.1802283760250326,-0.6687416938731658,-0.615137781609969,-0.5412513079498869,-0.5035836939270999,-0.4963399219996409,-0.3500157290649685,-0.3123481150421815,-0.9570438165860353,-0.2471541676950502,-0.510827465854559,-0.8353484482047235,-0.8744648166130023,-0.4456335185074277,-0.8411434657466907,-0.8208609043498055,1.592763901879544,1.463824761570773,1.449337217715855,1.210292744109707,1.092943638884871,0.9640044985760998,0.8408603758092963,0.8872205161450342,1.615943972047413,1.449337217715855,1.181317656399871,1.391387042296183,1.285627972155281,1.630431515902331,1.688381691322003,1.707215498333396,1.600007673807003,1.740536849199708,1.778204463222495,1.818769586016266,1.699971726405938,1.702869235176921,1.600007673807003,1.481209814196675,1.030647200308723,1.034993463465198,0.9321319020952801,0.7887052179315913],[-1.142035971697136,-0.8646752307738644,-0.3838788239602893,0.3460523606864875,0.2073397391410141,-0.675268408811541,-0.8977528864495553,-0.6750048215737084,4.60843843777219,-0.3125159909717676,-0.1733325203671122,1.302410595446094,-0.5007107340676066,1.558764682083909,-0.06730332435517432,-0.9036047867559547,-1.187149118964756,0.1077211638446055,1.118692652804391,-1.269808506223806,-0.2410710511165502,0.2742654439552507,-1.084070700737333,-1.072671074907415,1.450882493643402,-0.03465366558223248,-1.056146290808672,0.5672995086990664,-1.27664440027765,-0.785373841948223,0.5036894722425299,-1.386602176843706,-0.9085566331797887,-0.6784367145914818,-1.022383647950355,0.9983693565054481,-0.3137410332163431,0.4040090621595926,-1.208311612147872,2.215691851901015,1.325966023590592,0.1029455186097627,0.7160635427801253,1.631431699535645,-0.7651564791732062,0.2088627570745437,0.1778047484512288,0.1601935863162158,-0.852607042380964,-0.6615631968092339,-0.6545334522811015,-0.2841034241864891,-0.5625359667854918,-0.6255871982280424,0.4414310121237999,-1.181964280964444,0.5935582229960595,-1.361321756763808,-0.8424074884897069,0.1042976778409914,-0.1681074138247962,0.326496733501331,0.08877454295337175,0.4579460387058912,-0.6927268226015174,-0.3551176621533341,-0.2923072319879637,0.3130919897058406,0.326496733501331,0.125347272560843,1.336697792435534,0.7681216648253059,0.355394228109071,-0.1255799526399455,0.08625371021998678,0.08888829111230417,-1.011284114473157,-1.124466879568058,-0.8293301333883325,-0.4423676839269937,0.4726564245449777,0.08888829111230417,1.098440927600121,0.5810956378081634,1.75234389151972,1.757583932312187,1.804072436174245],[-0.1573221546815272,0.6105000386624089,0.7694134181715693,0.06111515403480908,-0.2462085327897628,-2.010405052603688,0.8958232837953473,0.3030853284560115,0.7097614873760714,0.04874046777193339,0.1298614125560753,0.05211434967684886,-0.5334789504369694,-0.2878147947989455,-0.2267613561909043,-2.069175422303223,-0.2164835230759523,-0.7636473608916149,-0.319851801961617,1.848019507160035,0.7394099040459553,1.410139808456291,-2.033465655716946,0.9266852181434571,-0.7587782165190843,1.671738224183601,0.5615347175420771,0.1802920336578543,0.04924660746512691,0.6409316933350359,0.4645102025730785,-1.907015392082143,0.1907785809799027,0.2841184746787068,-0.5237073962374412,1.086084280994433,-0.1704403074209715,0.3064821136285418,-0.1882637097422164,-0.1060440835013234,0.2510985517350144,1.422144601152631,0.9845663031719892,1.619206396164092,-1.879032629012748,0.2577634791100012,-0.3941402042040918,-0.4299826238619498,-0.6826585644763808,1.651967572099707,0.09046548275576718,-1.875966764383507,1.160012949087642,0.9441375769709478,-1.711415611497961,-1.925876230153947,0.4506370030008801,-1.468174009326193,-1.780569041777685,0.5241041416290096,0.1677341740264911,0.6244001286199573,0.6153995442102094,1.464544750677694,0.7004284117068755,1.184638966558762,0.8777038950071105,0.8736118912774146,0.6244001286199573,-0.04833791164733257,-0.3455408419035694,-0.319908165373932,-0.8044254867500539,-0.5960552646542794,-0.4336617627789057,-0.6052052651080962,0.6283206334429917,0.342575370237153,-1.284027901963198,-1.781162877578544,-0.5456472986181022,-0.6052052651080962,-0.3507937599129385,1.278452367828339,0.2546348189272692,-1.984867854281843,1.438183599964608],[0.06448364253156436,-0.7418576856383637,-0.9305758688270703,0.01301504711646256,0.3732952150221751,-0.5359833039779566,-0.4845147085628548,-0.8276386779968667,5.623091947362558,-0.7418576856383637,-0.1928593345439446,0.7678877798712889,0.2188894287768697,1.95166547441863,0.4076076119655763,-1.325168433676184,-0.3815775177326512,0.4933886043240793,0.973762161531696,-0.9305758688270703,-0.518827105506256,0.2875142226636721,0.4933886043240793,-1.308012235204483,2.380570436211145,-0.3129527238458488,-1.187918845902579,0.1845770318334685,-0.5531395024496571,-0.9477320672987709,0.4419200089089775,-0.7418576856383637,-0.7933262810534656,-0.9305758688270703,-0.9992006627138728,0.4419200089089775,-0.6389204948081602,0.09879603947496554,-1.050669258128974,1.436979520267612,1.488448115682714,-0.1585469376005434,0.8193563752863907,1.488448115682714,-0.4158899146760524,-0.07276594524204043,-0.2100155330156452,-0.2271717314873458,-0.2443279299590464,-0.9648882657704715,-0.9648882657704715,-0.6389204948081602,-0.6560766932798607,-0.261484128430747,0.04732744405986375,-0.518827105506256,0.3904514134938757,-1.102137853544076,-0.7247014871666632,-0.1928593345439446,-0.3987337162043518,0.1674208333617679,0.3389828180787739,0.3561390165504745,-0.1585469376005434,-0.4845147085628548,-0.1585469376005434,-0.1242345406571422,0.1674208333617679,0.3046704211353727,1.025230756946798,0.4933886043240793,0.03017124558816315,-0.4158899146760524,-0.3301089223175494,-0.02129734982693864,-0.6732328917515614,-1.084981655072376,-1.170762647430879,-0.4502023116194536,0.1159522379466661,-0.02129734982693864,0.8708249707014925,0.6477943905693847,1.608541504984618,0.887981169173193,2.020290268305433],["CT-UC-01-10","CT-UC-01-23","CT-UC-01-31","CT-UC-02-10","CT-UC-02-21","CT-UC-02-22","CT-UC-02-26","CT-UC-01-01","CT-UC-01-02","CT-UC-01-03","CT-UC-01-04","CT-UC-01-05","CT-UC-01-07","CT-UC-01-08","CT-UC-01-09","CT-UC-01-11","CT-UC-01-12","CT-UC-01-13","CT-UC-01-14","CT-UC-01-15","CT-UC-01-16","CT-UC-01-17","CT-UC-01-18","CT-UC-01-20","CT-UC-01-21","CT-UC-01-22","CT-UC-01-24","CT-UC-01-25","CT-UC-01-26","CT-UC-01-28","CT-UC-01-29","CT-UC-02-35","CT-UC-02-34","CT-UC-02-01","CT-UC-02-02","CT-UC-02-03","CT-UC-02-04","CT-UC-02-05","CT-UC-02-06","CT-UC-02-07","CT-UC-02-08","CT-UC-02-11","CT-UC-02-12","CT-UC-02-13","CT-UC-02-14","CT-UC-02-15","CT-UC-02-16","CT-UC-02-17","CT-UC-02-18","CT-UC-02-23","CT-UC-02-24","CT-UC-02-25","CT-UC-02-27","CT-UC-02-28","CT-UC-02-29","CT-UC-02-30","CT-UC-02-31","CT-UC-02-32","CT-UC-02-33","EM-CT01-EA","EM-CT02-EA","EM-CT03-EA","EM-CT04-EA","EM-CT05-EA","EM-CT06-EA","EM-CT07-EA","EM-CT08-EA","EM-CT09-EA","EM-CT11-EA","EM-CT12-EA","EM-CT13-EA","EM-CT14-EA","EM-CT15-EA","EM-CT16-EA","EM-CT17-EA","EM-CT18-EA","EM-CT19-EA","EM-CT20-EA","EM-CT21-EA","EM-CT22-EA","EM-CT23-EA","EM-CT24-EA","EM-CT25-EA","EM-CT26-EA","EM-CT27-EA","EM-CT28-EA","EM-CT29-EA"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>ID<\/th>\n      <th>elevation<\/th>\n      <th>slope<\/th>\n      <th>aspect<\/th>\n      <th>roughness<\/th>\n      <th>camara<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[1,2,3,4,5]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"ID","targets":1},{"name":"elevation","targets":2},{"name":"slope","targets":3},{"name":"aspect","targets":4},{"name":"roughness","targets":5},{"name":"camara","targets":6}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="occupancy" class="level1">
+<h1>Occupancy</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="do">#############</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Occu analisys</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Make unmarked frame</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>umf_y_full<span class="ot">&lt;-</span> <span class="fu">unmarkedFrameOccu</span>(<span class="at">y=</span> y_full[,<span class="dv">1</span><span class="sc">:</span><span class="dv">108</span>])</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">siteCovs</span>(umf_y_full) <span class="ot">&lt;-</span> full_covs_s <span class="co"># data.frame(Elev=full_covs$Elev) # Full</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="do">#######Graficar umf</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(umf_y_full)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="parte2_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 <section id="conclusión" class="level1">
 <h1>Conclusión</h1>
@@ -279,19 +441,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pkgs <span class="ot">&lt;-</span> <span class="fu">cite_packages</span>(<span class="at">output =</span> <span class="st">"paragraph"</span>, <span class="at">pkgs=</span><span class="st">"Session"</span>, <span class="at">out.dir =</span> <span class="st">"."</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># knitr::kable(pkgs)</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>pkgs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>pkgs <span class="ot">&lt;-</span> <span class="fu">cite_packages</span>(<span class="at">output =</span> <span class="st">"paragraph"</span>, <span class="at">pkgs=</span><span class="st">"Session"</span>, <span class="at">out.dir =</span> <span class="st">"."</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># knitr::kable(pkgs)</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>pkgs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p>We used R version 4.4.2 <span class="citation" data-cites="base">[@base]</span> and the following R packages: maps v. 3.4.2.1 <span class="citation" data-cites="maps">[@maps]</span>, mapview v. 2.11.2 <span class="citation" data-cites="mapview">[@mapview]</span>, sf v. 1.0.19 <span class="citation" data-cites="sf2018 sf2023">[@sf2018; @sf2023]</span>, unmarked v. 1.4.3 <span class="citation" data-cites="unmarked2011 unmarked2023">[@unmarked2011; @unmarked2023]</span>.</p>
+<p>We used R version 4.4.2 <span class="citation" data-cites="base">[@base]</span> and the following R packages: DT v. 0.33 <span class="citation" data-cites="DT">[@DT]</span>, elevatr v. 0.99.0 <span class="citation" data-cites="elevatr">[@elevatr]</span>, maps v. 3.4.2.1 <span class="citation" data-cites="maps">[@maps]</span>, mapview v. 2.11.2 <span class="citation" data-cites="mapview">[@mapview]</span>, sf v. 1.0.19 <span class="citation" data-cites="sf2018 sf2023">[@sf2018; @sf2023]</span>, terra v. 1.8.21 <span class="citation" data-cites="terra">[@terra]</span>, tidyverse v. 2.0.0 <span class="citation" data-cites="tidyverse">[@tidyverse]</span>, unmarked v. 1.4.3 <span class="citation" data-cites="unmarked2011 unmarked2023">[@unmarked2011; @unmarked2023]</span>.</p>
 </div>
 </div>
 </section>
 <section id="sesion-info" class="level2">
 <h2 class="anchored" data-anchor-id="sesion-info">Sesion info</h2>
 <div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -300,10 +462,10 @@ Note
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">sessionInfo</span>(), <span class="at">locale =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">sessionInfo</span>(), <span class="at">locale =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>R version 4.4.2 (2024-10-31 ucrt)
 Platform: x86_64-w64-mingw32/x64
@@ -316,22 +478,28 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] maps_3.4.2.1    sf_1.0-19       unmarked_1.4.3  mapview_2.11.2 
-[5] grateful_0.2.10
+[1] maps_3.4.2.1    elevatr_0.99.0  terra_1.8-21    unmarked_1.4.3 
+[5] DT_0.33         readr_2.1.5     sf_1.0-19       mapview_2.11.2 
+[9] grateful_0.2.10
 
 loaded via a namespace (and not attached):
- [1] class_7.3-22       KernSmooth_2.23-24 lattice_0.22-6     digest_0.6.37     
- [5] magrittr_2.0.3     evaluate_1.0.1     grid_4.4.2         fastmap_1.2.0     
- [9] jsonlite_1.8.9     e1071_1.7-16       DBI_1.2.3          crosstalk_1.2.1   
-[13] scales_1.3.0       codetools_0.2-20   cli_3.6.3          rlang_1.1.4       
-[17] units_0.8-5        munsell_0.5.1      base64enc_0.1-3    yaml_2.3.10       
-[21] tools_4.4.2        raster_3.6-30      parallel_4.4.2     colorspace_2.1-1  
-[25] R6_2.6.1           png_0.1-8          stats4_4.4.2       proxy_0.4-27      
-[29] lifecycle_1.0.4    classInt_0.4-10    leaflet_2.2.2      htmlwidgets_1.6.4 
-[33] MASS_7.3-61        terra_1.8-21       glue_1.8.0         Rcpp_1.0.13-1     
-[37] xfun_0.49          rstudioapi_0.17.1  knitr_1.49         htmltools_0.5.8.1 
-[41] rmarkdown_2.29     leafem_0.2.3       satellite_1.0.5    compiler_4.4.2    
-[45] sp_2.1-4          </code></pre>
+ [1] bslib_0.8.0        xfun_0.49          raster_3.6-30      htmlwidgets_1.6.4 
+ [5] lattice_0.22-6     tzdb_0.4.0         vctrs_0.6.5        tools_4.4.2       
+ [9] crosstalk_1.2.1    curl_6.0.0         stats4_4.4.2       parallel_4.4.2    
+[13] tibble_3.2.1       proxy_0.4-27       pkgconfig_2.0.3    KernSmooth_2.23-24
+[17] satellite_1.0.5    leaflet_2.2.2      lifecycle_1.0.4    compiler_4.4.2    
+[21] progress_1.2.3     munsell_0.5.1      codetools_0.2-20   sass_0.4.9        
+[25] htmltools_0.5.8.1  class_7.3-22       yaml_2.3.10        jquerylib_0.1.4   
+[29] pillar_1.10.1      crayon_1.5.3       MASS_7.3-61        slippymath_0.3.1  
+[33] classInt_0.4-10    cachem_1.1.0       tidyselect_1.2.1   digest_0.6.37     
+[37] purrr_1.0.2        fastmap_1.2.0      grid_4.4.2         colorspace_2.1-1  
+[41] cli_3.6.3          magrittr_2.0.3     base64enc_0.1-3    leafem_0.2.3      
+[45] e1071_1.7-16       prettyunits_1.2.0  scales_1.3.0       sp_2.1-4          
+[49] bit64_4.5.2        httr_1.4.7         rmarkdown_2.29     bit_4.5.0.1       
+[53] progressr_0.15.0   png_0.1-8          hms_1.1.3          evaluate_1.0.1    
+[57] knitr_1.49         rlang_1.1.4        Rcpp_1.0.13-1      glue_1.8.0        
+[61] DBI_1.2.3          rstudioapi_0.17.1  vroom_1.6.5        jsonlite_1.8.9    
+[65] R6_2.6.1           units_0.8-5       </code></pre>
 </div>
 </div>
 </div>
