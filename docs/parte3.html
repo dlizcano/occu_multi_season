@@ -106,6 +106,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 <meta name="twitter:title" content="Modelado de la Ocupación, abundancia y densidad de poblaciones - parte3">
@@ -188,7 +217,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#modelo-de-ocupación-diámico-con-datos-simulados" id="toc-modelo-de-ocupación-diámico-con-datos-simulados" class="nav-link active" data-scroll-target="#modelo-de-ocupación-diámico-con-datos-simulados">Modelo de Ocupación Diámico con datos simulados</a>
+  <li><a href="#modelo-de-ocupación-dinámico" id="toc-modelo-de-ocupación-dinámico" class="nav-link active" data-scroll-target="#modelo-de-ocupación-dinámico">Modelo de Ocupación Dinámico</a>
+  <ul class="collapse">
+  <li><a href="#parámetros-adicionales" id="toc-parámetros-adicionales" class="nav-link" data-scroll-target="#parámetros-adicionales">Parámetros Adicionales</a></li>
+  <li><a href="#recordemos-el-modelo-estático" id="toc-recordemos-el-modelo-estático" class="nav-link" data-scroll-target="#recordemos-el-modelo-estático">Recordemos el Modelo estático</a></li>
+  <li><a href="#recordemos-la-forma-de-la-distribución-bernoulli" id="toc-recordemos-la-forma-de-la-distribución-bernoulli" class="nav-link" data-scroll-target="#recordemos-la-forma-de-la-distribución-bernoulli">Recordemos la forma de la distribución Bernoulli!</a></li>
+  <li><a href="#el-algebra-y-los-parámetros-de-los-modelos" id="toc-el-algebra-y-los-parámetros-de-los-modelos" class="nav-link" data-scroll-target="#el-algebra-y-los-parámetros-de-los-modelos">El algebra y los parámetros de los modelos</a>
+  <ul class="collapse">
+  <li><a href="#modelo-estatico" id="toc-modelo-estatico" class="nav-link" data-scroll-target="#modelo-estatico">Modelo estatico:</a></li>
+  <li><a href="#algebra-del-modelo-dinámico" id="toc-algebra-del-modelo-dinámico" class="nav-link" data-scroll-target="#algebra-del-modelo-dinámico">Algebra del Modelo Dinámico</a></li>
+  <li><a href="#modelo-dinámico-considerando-colonización-y-extinción" id="toc-modelo-dinámico-considerando-colonización-y-extinción" class="nav-link" data-scroll-target="#modelo-dinámico-considerando-colonización-y-extinción">Modelo Dinámico considerando colonización y extinción</a></li>
+  </ul></li>
+  <li><a href="#la-función-colext-dentro-del-paquete-unmarked" id="toc-la-función-colext-dentro-del-paquete-unmarked" class="nav-link" data-scroll-target="#la-función-colext-dentro-del-paquete-unmarked">La función Colext dentro del paquete unmarked</a></li>
+  </ul></li>
+  <li><a href="#modelo-de-ocupación-diámico-con-datos-simulados" id="toc-modelo-de-ocupación-diámico-con-datos-simulados" class="nav-link" data-scroll-target="#modelo-de-ocupación-diámico-con-datos-simulados">Modelo de Ocupación Diámico con datos simulados</a>
   <ul class="collapse">
   <li><a href="#simulando-formateando-y-resumiendo-datos" id="toc-simulando-formateando-y-resumiendo-datos" class="nav-link" data-scroll-target="#simulando-formateando-y-resumiendo-datos">Simulando, formateando y resumiendo datos</a></li>
   </ul></li>
@@ -247,6 +289,108 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<section id="modelo-de-ocupación-dinámico" class="level1">
+<h1>Modelo de Ocupación Dinámico</h1>
+<p>Este documento contiene un ejemplo del modelo de ocupación de una sola especie y varias temporadas. Este modelo fue descrito por MacKenzie et. al (2003) en:</p>
+<blockquote class="blockquote">
+<p>MacKenzie, D. I., J. D. Nichols, J. E. Hines, M. G. Knutson, and A. B. Franklin. 2003. Estimating site occupancy, colonization, and local extinction when a species is detected imperfectly. Ecology 84:2200–2207.</p>
+</blockquote>
+<p><img src="https://dlizcano.github.io/occu_multi_season//img/fig1.jpg" class="img-fluid"></p>
+<section id="parámetros-adicionales" class="level2">
+<h2 class="anchored" data-anchor-id="parámetros-adicionales">Parámetros Adicionales</h2>
+<p>Este modelo incluye dos parámetros adicionales que representan la colonización y extinción de cada sitio. Estos dos parámetros adicionales pueden ser modelados con covariables que varían año a año.</p>
+<p>Antes de entrar en materia con el modelo dinámico vale la pena que revisemos el modelo básico de ocupación.</p>
+</section>
+<section id="recordemos-el-modelo-estático" class="level2">
+<h2 class="anchored" data-anchor-id="recordemos-el-modelo-estático">Recordemos el Modelo estático</h2>
+<p>Recordemos que el modelo básico de ocupación de MacKenzie et. al (2002), también es conocido como el modelo estático de ocupación. Este modelo se aplica a una sola especie, y por lo general en una sola temporada.</p>
+<p><img src="https://dlizcano.github.io/occu_multi_season//img/Occu_Bayes.png" class="img-fluid"></p>
+<p>Donde<br>
+ψ es la ocupación y p la probabilidad de detección. Con<br>
+β como el coeficiente de la regresión para las co-variables de la ocupación y<br>
+α el coeficiente de regresión para las co-variables de la detección.</p>
+<p>Si desean conocer en detalle el modelo estático y saber más del poder y potencial de las simulaciones en ecología, les recomiendo seguir el <a href="https://dlizcano.github.io/IntroOccuBook/example.html">Tutorial Ubicado en este enlace</a>.</p>
+</section>
+<section id="recordemos-la-forma-de-la-distribución-bernoulli" class="level2">
+<h2 class="anchored" data-anchor-id="recordemos-la-forma-de-la-distribución-bernoulli">Recordemos la forma de la distribución Bernoulli!</h2>
+<p>La distribución de Bernoulli (o distribución dicotómica), nombrada así por el matemático suizo Jacob Bernoulli (1655-1705).</p>
+<p><img src="https://dlizcano.github.io/occu_multi_season/img/jacob_bernoulli.jpg" class="img-fluid"></p>
+<p>Esta es una distribución de probabilidad discreta, que toma valor 1 para la probabilidad de éxito (p) y valor 0 para la probabilidad de fracaso (q=1-p).</p>
+<p>La distribución de Bernoulli es un caso particular de la distribución binomial, pero con solo dos posibles resultados (éxito o fracaso) unos y ceros.</p>
+<blockquote class="blockquote">
+<p>El proceso Bernoulli es el más simple proceso aleatorio que existe! Imagínemelo como algo tan sencillo como una secuencia de lanzamientos de una moneda. Donde un solo lanzamiento es un “trial” y muchos lanzamientos componen el proceso.</p>
+</blockquote>
+<p>Usemos el siguiente código ejecutándolo varias veces y cambiando los parámetros para entender su efecto en el resultado.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>ni<span class="ot">&lt;-</span><span class="dv">10</span> <span class="co"># numero de datos</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>pi<span class="ot">&lt;-</span> <span class="fl">0.5</span> <span class="co"># probabilidad (~proporcion de unos)</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Generemos datos con esa informacion </span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>daber<span class="ot">&lt;-</span><span class="fu">data.frame</span>(<span class="at">estimado=</span><span class="fu">rbinom</span>(ni, <span class="dv">1</span>, pi)) </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Grafiquemos </span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(daber, <span class="fu">aes</span>(<span class="at">x=</span>estimado)) <span class="sc">+</span> </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>(<span class="fu">aes</span>(<span class="at">y=</span>..density..), <span class="co"># Histograma y densidad </span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>                   <span class="at">binwidth=</span>.<span class="dv">1</span>, <span class="co"># Ancho del bin</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>                   <span class="at">colour=</span><span class="st">"black"</span>, <span class="at">fill=</span><span class="st">"white"</span>) <span class="sc">+</span> </span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_vline</span>(<span class="fu">aes</span>(<span class="at">xintercept=</span><span class="fu">mean</span>(estimado, <span class="at">na.rm=</span>T)), </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>          <span class="at">color=</span><span class="st">"blue"</span>, <span class="at">linetype=</span><span class="st">"dashed"</span>, <span class="at">size=</span><span class="dv">1</span>) <span class="co"># media en azul</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+ℹ Please use `linewidth` instead.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The dot-dot notation (`..density..`) was deprecated in ggplot2 3.4.0.
+ℹ Please use `after_stat(density)` instead.</code></pre>
+</div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="parte3_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Si desean conocer más detalles de la distribución Bernoulli les recomiendo la muy buena explicación de <a href="https://www.youtube.com/watch?v=bT1p5tJwn_0">jbstatistics</a></p>
+<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/bT1p5tJwn_0" title="Introduction to the Bernoulli Distribution" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
+<p>Y si quieren aún más detalles visiten la clase del profesor <a href="https://www.youtube.com/watch?v=gMTiAeE0NCw">Tsitsiklis</a> del MIT.</p>
+</section>
+<section id="el-algebra-y-los-parámetros-de-los-modelos" class="level2">
+<h2 class="anchored" data-anchor-id="el-algebra-y-los-parámetros-de-los-modelos">El algebra y los parámetros de los modelos</h2>
+<section id="modelo-estatico" class="level3">
+<h3 class="anchored" data-anchor-id="modelo-estatico">Modelo estatico:</h3>
+<p><span class="math inline">\(z_{i} \sim Bernoulli (\psi_{i})\)</span> Proceso Ecológico</p>
+<p><span class="math inline">\(y_{ij} \sim Bernoulli (z_{i} * p_{ij})\)</span> Proceso de Observación</p>
+<p>con sitio i durante el muestreo j</p>
+<section id="de-forma-lineal" class="level4">
+<h4 class="anchored" data-anchor-id="de-forma-lineal">De forma Lineal</h4>
+<p>logit(Ψi) = α0 + α1xi1 + . . . + αUxiU.</p>
+<p>logit(pij) = β0 + β1xi1 + . . . + βUxiU + βU+1yij1 + . . . + βU+V yijV.</p>
+</section>
+</section>
+<section id="algebra-del-modelo-dinámico" class="level3">
+<h3 class="anchored" data-anchor-id="algebra-del-modelo-dinámico">Algebra del Modelo Dinámico</h3>
+<p><span class="math inline">\(z_{it} \sim Bernoulli (\psi_{i,t})\)</span> Proceso Ecológico</p>
+<p><span class="math inline">\(y_{ijt} \sim Bernoulli (z_{i} * p_{i,tj})\)</span> Proceso de Observación</p>
+<p>con sitio i durante el muestreo j en el tiempo t (años)</p>
+</section>
+<section id="modelo-dinámico-considerando-colonización-y-extinción" class="level3">
+<h3 class="anchored" data-anchor-id="modelo-dinámico-considerando-colonización-y-extinción">Modelo Dinámico considerando colonización y extinción</h3>
+<p><img src="https://dlizcano.github.io/occu_multi_season/img/colext.png" class="img-fluid"></p>
+<p><span class="math inline">\(z_{it} \sim Bernoulli (z_{i,t-1\phi it } + (1-z_{i,t-1}) \gamma_{i,t})\)</span> Proceso Ecológico</p>
+<p><span class="math inline">\(y_{ijt} \sim Bernoulli (z_{it} * p_{ijt})\)</span> Proceso de Observación</p>
+<section id="de-forma-lineal-1" class="level4">
+<h4 class="anchored" data-anchor-id="de-forma-lineal-1">De forma Lineal</h4>
+<p>logit(Ψi,1) = α0 + α1xi1 + . . . + αUxiU.</p>
+<p>Ψi,t|zi,t−1 = zi,t−1 × (1 −<span class="math inline">\(\epsilon_{i}\)</span>,t−1) + (1 − zi,t−1) × <span class="math inline">\(\gamma_{i}\)</span>,t−1, for t &gt; 1.</p>
+</section>
+</section>
+</section>
+<section id="la-función-colext-dentro-del-paquete-unmarked" class="level2">
+<h2 class="anchored" data-anchor-id="la-función-colext-dentro-del-paquete-unmarked">La función Colext dentro del paquete unmarked</h2>
+<p><img src="https://dlizcano.github.io/occu_multi_season/img/unmarked.png" class="img-fluid"></p>
+</section>
+</section>
 <section id="modelo-de-ocupación-diámico-con-datos-simulados" class="level1">
 <h1>Modelo de Ocupación Diámico con datos simulados</h1>
 <p>Primero generamos un conjunto de datos simple y simulado con valores específicos de año específicos para los parámetros, así como especificaciones de diseño, es decir, número de sitios, años y encuestas por año.</p>
@@ -255,57 +399,57 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="simulando-formateando-y-resumiendo-datos">Simulando, formateando y resumiendo datos</h2>
 <p>Para simular los datos, ejecutamos el siguiente código R. Los valores reales para estos parámetros para cada año se extraen aleatoriamente de una distribución uniforme con los límites especificados.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>M <span class="ot">&lt;-</span> <span class="dv">250</span> <span class="co"># Number of sites  </span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>J <span class="ot">&lt;-</span> <span class="dv">3</span> <span class="co"># num secondary sample periods </span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>T <span class="ot">&lt;-</span> <span class="dv">10</span> <span class="co"># num primary sample periods  </span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>psi <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA</span>, T) <span class="co"># Occupancy probability  </span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>muZ <span class="ot">&lt;-</span> z <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="at">dim =</span> <span class="fu">c</span>(M, T)) <span class="co"># Expected and realized occurrence  </span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="at">dim =</span> <span class="fu">c</span>(M, J, T)) <span class="co"># Detection histories  </span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">13973</span>)  </span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>psi[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fl">0.4</span> <span class="co"># Initial occupancy probability  </span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.3</span>,<span class="fl">0.4</span>,<span class="fl">0.5</span>,<span class="fl">0.5</span>,<span class="fl">0.1</span>,<span class="fl">0.3</span>,<span class="fl">0.5</span>,<span class="fl">0.5</span>,<span class="fl">0.6</span>,<span class="fl">0.2</span>)  </span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>phi <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="at">n=</span>T<span class="dv">-1</span>, <span class="at">min=</span><span class="fl">0.6</span>, <span class="at">max=</span><span class="fl">0.8</span>) <span class="co"># Survival probability (1-epsilon)</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>gamma <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="at">n=</span>T<span class="dv">-1</span>, <span class="at">min=</span><span class="fl">0.1</span>, <span class="at">max=</span><span class="fl">0.2</span>) <span class="co"># Colonization probability  </span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate latent states of occurrence  </span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># First year  </span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>z[,<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(M, <span class="dv">1</span>, psi[<span class="dv">1</span>]) <span class="co"># Initial occupancy state  </span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Later years  </span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>M){ <span class="co"># Loop over sites </span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(k <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>T){ <span class="co"># Loop over years </span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    muZ[k] <span class="ot">&lt;-</span> z[i, k<span class="dv">-1</span>]<span class="sc">*</span>phi[k<span class="dv">-1</span>] <span class="sc">+</span> (<span class="dv">1</span><span class="sc">-</span>z[i, k<span class="dv">-1</span>])<span class="sc">*</span>gamma[k<span class="dv">-1</span>] </span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    z[i,k] <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(<span class="dv">1</span>, <span class="dv">1</span>, muZ[k]) </span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    } </span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  }  <span class="co"># Generate detection/non-detection data  </span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>M){ </span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>T){ </span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    prob <span class="ot">&lt;-</span> z[i,k] <span class="sc">*</span> p[k] </span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>J){ </span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>      y[i,j,k] <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(<span class="dv">1</span>, <span class="dv">1</span>, prob) </span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>      } </span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    } </span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  }  <span class="co"># Compute annual population occupancy  </span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>T){ </span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  psi[k] <span class="ot">&lt;-</span> psi[k<span class="dv">-1</span>]<span class="sc">*</span>phi[k<span class="dv">-1</span>] <span class="sc">+</span> (<span class="dv">1</span><span class="sc">-</span>psi[k<span class="dv">-1</span>])<span class="sc">*</span>gamma[k<span class="dv">-1</span>] </span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>M <span class="ot">&lt;-</span> <span class="dv">250</span> <span class="co"># Number of sites  </span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>J <span class="ot">&lt;-</span> <span class="dv">3</span> <span class="co"># num secondary sample periods </span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>T <span class="ot">&lt;-</span> <span class="dv">10</span> <span class="co"># num primary sample periods  </span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>psi <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA</span>, T) <span class="co"># Occupancy probability  </span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>muZ <span class="ot">&lt;-</span> z <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="at">dim =</span> <span class="fu">c</span>(M, T)) <span class="co"># Expected and realized occurrence  </span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="at">dim =</span> <span class="fu">c</span>(M, J, T)) <span class="co"># Detection histories  </span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">13973</span>)  </span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>psi[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fl">0.4</span> <span class="co"># Initial occupancy probability  </span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.3</span>,<span class="fl">0.4</span>,<span class="fl">0.5</span>,<span class="fl">0.5</span>,<span class="fl">0.1</span>,<span class="fl">0.3</span>,<span class="fl">0.5</span>,<span class="fl">0.5</span>,<span class="fl">0.6</span>,<span class="fl">0.2</span>)  </span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>phi <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="at">n=</span>T<span class="dv">-1</span>, <span class="at">min=</span><span class="fl">0.6</span>, <span class="at">max=</span><span class="fl">0.8</span>) <span class="co"># Survival probability (1-epsilon)</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>gamma <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="at">n=</span>T<span class="dv">-1</span>, <span class="at">min=</span><span class="fl">0.1</span>, <span class="at">max=</span><span class="fl">0.2</span>) <span class="co"># Colonization probability  </span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate latent states of occurrence  </span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co"># First year  </span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>z[,<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(M, <span class="dv">1</span>, psi[<span class="dv">1</span>]) <span class="co"># Initial occupancy state  </span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Later years  </span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>M){ <span class="co"># Loop over sites </span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(k <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>T){ <span class="co"># Loop over years </span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    muZ[k] <span class="ot">&lt;-</span> z[i, k<span class="dv">-1</span>]<span class="sc">*</span>phi[k<span class="dv">-1</span>] <span class="sc">+</span> (<span class="dv">1</span><span class="sc">-</span>z[i, k<span class="dv">-1</span>])<span class="sc">*</span>gamma[k<span class="dv">-1</span>] </span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    z[i,k] <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(<span class="dv">1</span>, <span class="dv">1</span>, muZ[k]) </span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    } </span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>  }  <span class="co"># Generate detection/non-detection data  </span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>M){ </span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(k <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>T){ </span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    prob <span class="ot">&lt;-</span> z[i,k] <span class="sc">*</span> p[k] </span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>J){ </span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>      y[i,j,k] <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(<span class="dv">1</span>, <span class="dv">1</span>, prob) </span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>      } </span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    } </span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>  }  <span class="co"># Compute annual population occupancy  </span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>T){ </span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>  psi[k] <span class="ot">&lt;-</span> psi[k<span class="dv">-1</span>]<span class="sc">*</span>phi[k<span class="dv">-1</span>] <span class="sc">+</span> (<span class="dv">1</span><span class="sc">-</span>psi[k<span class="dv">-1</span>])<span class="sc">*</span>gamma[k<span class="dv">-1</span>] </span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>  }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Hemos generado una sola realización del sistema estocástico así definido. La Figura 1 ilustra la cuestión fundamental de la detección imperfecta: la proporción real de sitios ocupados difiere mucho de la proporción observada de sitios ocupados, y debido a que p varía entre años, los datos observados no pueden usarse como un índice válido del parámetro de interés ψi.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span>T, <span class="fu">colMeans</span>(z), <span class="at">type =</span> <span class="st">"b"</span>, <span class="at">xlab =</span> <span class="st">"Year"</span>, <span class="at">ylab =</span> <span class="st">"Proportion of sites occupied"</span>, <span class="at">col =</span> <span class="st">"black"</span>, <span class="at">xlim=</span><span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">10.5</span>), </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>      <span class="at">xaxp=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">10</span>,<span class="dv">9</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="fl">0.6</span>), </span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">1</span>, <span class="at">frame.plot =</span> <span class="cn">FALSE</span>, </span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">las =</span> <span class="dv">1</span>, <span class="at">pch=</span><span class="dv">16</span>)  </span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>psi.app <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(<span class="fu">apply</span>(y, <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>), max))  </span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="dv">1</span><span class="sc">:</span>T, psi.app, <span class="at">type =</span> <span class="st">"b"</span>, <span class="at">col =</span> <span class="st">"blue"</span>, </span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">lty=</span><span class="dv">3</span>, <span class="at">lwd =</span> <span class="dv">2</span>)  </span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="dv">1</span>, <span class="fl">0.6</span>, <span class="fu">c</span>(<span class="st">"truth"</span>, <span class="st">"observed"</span>), </span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">col=</span><span class="fu">c</span>(<span class="st">"black"</span>, <span class="st">"blue"</span>), <span class="at">lty=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>), <span class="at">pch=</span><span class="fu">c</span>(<span class="dv">16</span>,<span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span>T, <span class="fu">colMeans</span>(z), <span class="at">type =</span> <span class="st">"b"</span>, <span class="at">xlab =</span> <span class="st">"Year"</span>, <span class="at">ylab =</span> <span class="st">"Proportion of sites occupied"</span>, <span class="at">col =</span> <span class="st">"black"</span>, <span class="at">xlim=</span><span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">10.5</span>), </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>      <span class="at">xaxp=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">10</span>,<span class="dv">9</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="fl">0.6</span>), </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">lty =</span> <span class="dv">1</span>, <span class="at">frame.plot =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">las =</span> <span class="dv">1</span>, <span class="at">pch=</span><span class="dv">16</span>)  </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>psi.app <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(<span class="fu">apply</span>(y, <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>), max))  </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="dv">1</span><span class="sc">:</span>T, psi.app, <span class="at">type =</span> <span class="st">"b"</span>, <span class="at">col =</span> <span class="st">"blue"</span>, </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">lty=</span><span class="dv">3</span>, <span class="at">lwd =</span> <span class="dv">2</span>)  </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="dv">1</span>, <span class="fl">0.6</span>, <span class="fu">c</span>(<span class="st">"truth"</span>, <span class="st">"observed"</span>), </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">col=</span><span class="fu">c</span>(<span class="st">"black"</span>, <span class="st">"blue"</span>), <span class="at">lty=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>), <span class="at">pch=</span><span class="fu">c</span>(<span class="dv">16</span>,<span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="parte3_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="parte3_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -316,20 +460,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Analizando los datos</h1>
 <p>Para analizar este conjunto de datos con un modelo de ocupación dinámico sin marcar, primero cargamos el paquete, y luego a continuación, formateamos los datos de detección / no detección de una matriz tridimensional (como se genera) en una matriz bidimensional con M filas. Es decir, colocamos las tablas de datos anuales (los segmentos de la matriz 3-D anterior) de lado para producir un diseño “amplio” de los datos. Posteriormente, creamos una matriz que indica el año en que se muestreo cada sitio.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(unmarked)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>yy <span class="ot">&lt;-</span> <span class="fu">matrix</span>(y, M, J<span class="sc">*</span>T)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>year <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="st">'01'</span>,<span class="st">'02'</span>,<span class="st">'03'</span>,<span class="st">'04'</span>,<span class="st">'05'</span>,<span class="st">'06'</span>,<span class="st">'07'</span>,<span class="st">'08'</span>,<span class="st">'09'</span>,<span class="st">'10'</span>), </span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>               <span class="fu">nrow</span>(yy), T, <span class="at">byrow=</span><span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(unmarked)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>yy <span class="ot">&lt;-</span> <span class="fu">matrix</span>(y, M, J<span class="sc">*</span>T)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>year <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="st">'01'</span>,<span class="st">'02'</span>,<span class="st">'03'</span>,<span class="st">'04'</span>,<span class="st">'05'</span>,<span class="st">'06'</span>,<span class="st">'07'</span>,<span class="st">'08'</span>,<span class="st">'09'</span>,<span class="st">'10'</span>), </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>               <span class="fu">nrow</span>(yy), T, <span class="at">byrow=</span><span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Para organizar los datos en el formato requerido por colext, utilizamos la función unmarkedMultFrame. Los únicos argumentos requeridos son y, los datos de detección / no detección, y numPrimary, el número de estaciones. Los tres tipos de covariables descritos anteriormente también se pueden suministrar utilizando los argumentos siteCovs, annualSiteCovs y obsCovs. En este caso, solo usamos el segundo tipo, que debe tener M filas y T columnas.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>simUMF <span class="ot">&lt;-</span> <span class="fu">unmarkedMultFrame</span>(<span class="at">y =</span> yy, </span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">yearlySiteCovs =</span> <span class="fu">list</span>(<span class="at">year =</span> year), </span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">numPrimary=</span>T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>simUMF <span class="ot">&lt;-</span> <span class="fu">unmarkedMultFrame</span>(<span class="at">y =</span> yy, </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">yearlySiteCovs =</span> <span class="fu">list</span>(<span class="at">year =</span> year), </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">numPrimary=</span>T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: yearlySiteCovs contains characters. Converting them to factors.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simUMF) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(simUMF) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>unmarkedFrame Object
 
@@ -360,15 +504,15 @@ Yearly-site-level covariates:
 <h1>Construcción y ajuste de modelos</h1>
 <p>Estamos listos para adaptar algunos modelos de ocupación dinámica. Ajustaremos un modelo con valores constantes para todos los parámetros (modelo nulo) y otro con dependencia total del tiempo para la probabilidad de colonización, extinción y detección.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a> <span class="co"># Model with all constant parameters  </span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>m0 <span class="ot">&lt;-</span> <span class="fu">colext</span>(<span class="at">psiformula=</span> <span class="sc">~</span><span class="dv">1</span>, </span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">gammaformula =</span> <span class="sc">~</span> <span class="dv">1</span>, </span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">epsilonformula =</span> <span class="sc">~</span> <span class="dv">1</span>, </span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">pformula =</span> <span class="sc">~</span> <span class="dv">1</span>, </span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">data =</span> simUMF, </span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">method=</span><span class="st">"BFGS"</span>)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m0)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a> <span class="co"># Model with all constant parameters  </span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>m0 <span class="ot">&lt;-</span> <span class="fu">colext</span>(<span class="at">psiformula=</span> <span class="sc">~</span><span class="dv">1</span>, </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>             <span class="at">gammaformula =</span> <span class="sc">~</span> <span class="dv">1</span>, </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>             <span class="at">epsilonformula =</span> <span class="sc">~</span> <span class="dv">1</span>, </span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">pformula =</span> <span class="sc">~</span> <span class="dv">1</span>, </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">data =</span> simUMF, </span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">method=</span><span class="st">"BFGS"</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(m0)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -401,15 +545,15 @@ Bootstrap iterations: 0 </code></pre>
 <p>El tiempo de cálculo fue de solo unos segundos. Tenga en cuenta que todos los parámetros se estimaron en la escala logit. Para volver a transformar a la escala original, simplemente podemos usar la función de logit inverso, llamada plogis en R.</p>
 <p>Alternativamente, podemos usar backTransform, que calcula los errores estándar usando el método delta. Los intervalos de confianza también se obtienen fácilmente utilizando la función con ﬁ n.&nbsp;Primero nos recordamos los nombres de los parámetros, que pueden usarse como argumentos para estas funciones.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plogis</span>(<span class="sc">-</span><span class="fl">0.813</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plogis</span>(<span class="sc">-</span><span class="fl">0.813</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.3072516</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(m0)  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(m0)  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "psi" "col" "ext" "det"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">backTransform</span>(m0, <span class="at">type=</span><span class="st">"psi"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">backTransform</span>(m0, <span class="at">type=</span><span class="st">"psi"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Backtransformed linear combination(s) of Initial estimate(s)
 
@@ -418,7 +562,7 @@ Bootstrap iterations: 0 </code></pre>
 
 Transformation: logistic </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(<span class="fu">backTransform</span>(m0, <span class="at">type=</span><span class="st">"psi"</span>))  <span class="co"># intervalos</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(<span class="fu">backTransform</span>(m0, <span class="at">type=</span><span class="st">"psi"</span>))  <span class="co"># intervalos</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     0.025     0.975
  0.2457313 0.3765804</code></pre>
@@ -427,13 +571,13 @@ Transformation: logistic </code></pre>
 <p>Luego ajustamos el modelo de ocupación dinámica con dependencia total del año en los parámetros que describen la dinámica de ocupación y también en la detección. Este es el mismo modelo bajo el cual generamos el conjunto de datos, por lo que esperaríamos estimaciones precisas.</p>
 <p>Por defecto en R, un factor como el año en este análisis, se parametriza en términos de una intersección y efectos que representan diferencias. Esto significaría que el parámetro para el primer año es la intersección y los efectos denotarían las diferencias entre los valores de los parámetros en todos los demás años, en relación con el valor del parámetro en el primer año, que sirve como nivel de referencia. Este tratamiento o la parametrización de los efectos es útil para evaluar las diferencias. Para una presentación simple, una parametrización de medias es más práctica. Se puede especificar agregando un -1 a la fórmula para los parámetros dependientes del tiempo</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a> m1 <span class="ot">&lt;-</span> <span class="fu">colext</span>(<span class="at">psiformula =</span> <span class="sc">~</span><span class="dv">1</span>, <span class="co"># First-year occupancy </span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">gammaformula =</span> <span class="sc">~</span> year<span class="dv">-1</span>, <span class="co"># Colonization </span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">epsilonformula =</span> <span class="sc">~</span> year<span class="dv">-1</span>, <span class="co"># Extinction </span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">pformula =</span> <span class="sc">~</span> year<span class="dv">-1</span>, <span class="co"># Detection </span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">data =</span> simUMF)</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>m1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a> m1 <span class="ot">&lt;-</span> <span class="fu">colext</span>(<span class="at">psiformula =</span> <span class="sc">~</span><span class="dv">1</span>, <span class="co"># First-year occupancy </span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">gammaformula =</span> <span class="sc">~</span> year<span class="dv">-1</span>, <span class="co"># Colonization </span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">epsilonformula =</span> <span class="sc">~</span> year<span class="dv">-1</span>, <span class="co"># Extinction </span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">pformula =</span> <span class="sc">~</span> year<span class="dv">-1</span>, <span class="co"># Detection </span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">data =</span> simUMF)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>m1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -487,13 +631,13 @@ AIC: 4779.172 </code></pre>
 <section id="selección-de-modelos" class="level2">
 <h2 class="anchored" data-anchor-id="selección-de-modelos">Selección de Modelos</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>models <span class="ot">&lt;-</span> <span class="fu">fitList</span>(</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'psi(.)gam(.)eps(.)p(.)'</span> <span class="ot">=</span> m0,</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'psi(.)gam(year)eps(year)p(year)'</span> <span class="ot">=</span> m1</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>      )</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>ms <span class="ot">&lt;-</span> <span class="fu">modSel</span>(models)</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>ms</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>models <span class="ot">&lt;-</span> <span class="fu">fitList</span>(</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'psi(.)gam(.)eps(.)p(.)'</span> <span class="ot">=</span> m0,</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'psi(.)gam(year)eps(year)p(year)'</span> <span class="ot">=</span> m1</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>ms <span class="ot">&lt;-</span> <span class="fu">modSel</span>(models)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>ms</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                                nPars     AIC  delta AICwt cumltvWt
 psi(.)gam(year)eps(year)p(year)    29 4779.17   0.00 1e+00     1.00
@@ -507,93 +651,93 @@ psi(.)gam(.)eps(.)p(.)              4 4972.60 193.43 1e-42     1.00</code></pre>
 <p>predic le permite al usuario proporcionar un marco de datos en el que cada fila representa una combinación de valores covariables de interés. A continuación, creamos los data.frames llamados nd y cada fila representa un año. Luego solicitamos estimaciones anuales de la probabilidad de extinción, colonización y detección, y las comparamos con la “verdad”, es decir, los valores con los que simulamos el conjunto de datos. Tenga en cuenta que hay parámetros de extinción y colonización T-1 en este caso, por lo que no es necesario incluir el año “10” en nd.</p>
 <p>Predict es mas versatil y devuelve las predicciones junto con errores estándar e intervalos de confianza. Estos se pueden usar para crear graficas. La función with se usa para simplificar el proceso de solicitud de las columnas de data.frame devueltas por predic.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Crear nuevo data frame</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>nd <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">year=</span><span class="fu">c</span>(<span class="st">'01'</span>,<span class="st">'02'</span>,<span class="st">'03'</span>,<span class="st">'04'</span>,<span class="st">'05'</span>,<span class="st">'06'</span>,<span class="st">'07'</span>,<span class="st">'08'</span>,<span class="st">'09'</span>))</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># predecir</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>E.ext <span class="ot">&lt;-</span> <span class="fu">predict</span>(m1, <span class="at">type=</span><span class="st">'ext'</span>, <span class="at">newdata=</span>nd)</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>E.col <span class="ot">&lt;-</span> <span class="fu">predict</span>(m1, <span class="at">type=</span><span class="st">'col'</span>, <span class="at">newdata=</span>nd) </span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>nd <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">year=</span><span class="fu">c</span>(<span class="st">'01'</span>,<span class="st">'02'</span>,<span class="st">'03'</span>,<span class="st">'04'</span>,<span class="st">'05'</span>,<span class="st">'06'</span>,<span class="st">'07'</span>,<span class="st">'08'</span>,<span class="st">'09'</span>,<span class="st">'10'</span>)) </span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>E.det <span class="ot">&lt;-</span> <span class="fu">predict</span>(m1, <span class="at">type=</span><span class="st">'det'</span>, <span class="at">newdata=</span>nd)</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="do">## Graficas </span></span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="do">### Extinction</span></span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a><span class="co"># op &lt;- par(mfrow=c(3,1), mai=c(0.6, 0.6, 0.1, 0.1)) </span></span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(E.ext,{ <span class="co"># Plot for extinction probability </span></span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, Predicted, <span class="at">pch=</span><span class="dv">1</span>, <span class="at">xaxt=</span><span class="st">'n'</span>, <span class="at">xlab=</span><span class="st">'Year'</span>, </span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">ylab=</span><span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">'Extinction probability ( '</span>, epsilon, <span class="st">' )'</span>)), </span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">col=</span><span class="dv">4</span>)</span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">axis</span>(<span class="dv">1</span>, <span class="at">at=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, <span class="at">labels=</span>nd<span class="sc">$</span>year[<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>]) </span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrows</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, lower, <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, upper, <span class="at">code=</span><span class="dv">3</span>, <span class="at">angle=</span><span class="dv">90</span>, <span class="at">length=</span><span class="fl">0.03</span>, <span class="at">col=</span><span class="dv">4</span>)</span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">points</span>((<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>)<span class="sc">-</span><span class="fl">0.1</span>, <span class="dv">1</span><span class="sc">-</span>phi, <span class="at">col=</span><span class="dv">1</span>, <span class="at">lwd =</span> <span class="dv">1</span>, <span class="at">pch=</span><span class="dv">16</span>) </span>
-<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">legend</span>(<span class="dv">7</span>, <span class="dv">1</span>, <span class="fu">c</span>(<span class="st">'Parametro verdadero'</span>, <span class="st">'Estimado'</span>), <span class="at">col=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">4</span>), <span class="at">pch=</span><span class="fu">c</span>(<span class="dv">16</span>, <span class="dv">1</span>), <span class="at">cex=</span><span class="fl">0.8</span>) </span>
-<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>  }) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Crear nuevo data frame</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>nd <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">year=</span><span class="fu">c</span>(<span class="st">'01'</span>,<span class="st">'02'</span>,<span class="st">'03'</span>,<span class="st">'04'</span>,<span class="st">'05'</span>,<span class="st">'06'</span>,<span class="st">'07'</span>,<span class="st">'08'</span>,<span class="st">'09'</span>))</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co"># predecir</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>E.ext <span class="ot">&lt;-</span> <span class="fu">predict</span>(m1, <span class="at">type=</span><span class="st">'ext'</span>, <span class="at">newdata=</span>nd)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>E.col <span class="ot">&lt;-</span> <span class="fu">predict</span>(m1, <span class="at">type=</span><span class="st">'col'</span>, <span class="at">newdata=</span>nd) </span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>nd <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">year=</span><span class="fu">c</span>(<span class="st">'01'</span>,<span class="st">'02'</span>,<span class="st">'03'</span>,<span class="st">'04'</span>,<span class="st">'05'</span>,<span class="st">'06'</span>,<span class="st">'07'</span>,<span class="st">'08'</span>,<span class="st">'09'</span>,<span class="st">'10'</span>)) </span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>E.det <span class="ot">&lt;-</span> <span class="fu">predict</span>(m1, <span class="at">type=</span><span class="st">'det'</span>, <span class="at">newdata=</span>nd)</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="do">## Graficas </span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="do">### Extinction</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="co"># op &lt;- par(mfrow=c(3,1), mai=c(0.6, 0.6, 0.1, 0.1)) </span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(E.ext,{ <span class="co"># Plot for extinction probability </span></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, Predicted, <span class="at">pch=</span><span class="dv">1</span>, <span class="at">xaxt=</span><span class="st">'n'</span>, <span class="at">xlab=</span><span class="st">'Year'</span>, </span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">ylab=</span><span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">'Extinction probability ( '</span>, epsilon, <span class="st">' )'</span>)), </span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">col=</span><span class="dv">4</span>)</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">axis</span>(<span class="dv">1</span>, <span class="at">at=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, <span class="at">labels=</span>nd<span class="sc">$</span>year[<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>]) </span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrows</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, lower, <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, upper, <span class="at">code=</span><span class="dv">3</span>, <span class="at">angle=</span><span class="dv">90</span>, <span class="at">length=</span><span class="fl">0.03</span>, <span class="at">col=</span><span class="dv">4</span>)</span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">points</span>((<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>)<span class="sc">-</span><span class="fl">0.1</span>, <span class="dv">1</span><span class="sc">-</span>phi, <span class="at">col=</span><span class="dv">1</span>, <span class="at">lwd =</span> <span class="dv">1</span>, <span class="at">pch=</span><span class="dv">16</span>) </span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">legend</span>(<span class="dv">7</span>, <span class="dv">1</span>, <span class="fu">c</span>(<span class="st">'Parametro verdadero'</span>, <span class="st">'Estimado'</span>), <span class="at">col=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">4</span>), <span class="at">pch=</span><span class="fu">c</span>(<span class="dv">16</span>, <span class="dv">1</span>), <span class="at">cex=</span><span class="fl">0.8</span>) </span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>  }) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="parte3_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="parte3_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="do">### colonization</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a> <span class="fu">with</span>(E.col, { <span class="co"># Plot for colonization probability </span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>   <span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, Predicted, <span class="at">pch=</span><span class="dv">1</span>, <span class="at">xaxt=</span><span class="st">'n'</span>, <span class="at">xlab=</span><span class="st">'Year'</span>, <span class="at">ylab=</span><span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">'Colonization probability ( '</span>, gamma, <span class="st">' )'</span>)), <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">col=</span><span class="dv">4</span>) </span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>   <span class="fu">axis</span>(<span class="dv">1</span>, <span class="at">at=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, <span class="at">labels=</span>nd<span class="sc">$</span>year[<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>]) </span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>   <span class="fu">arrows</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, lower, <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, upper, <span class="at">code=</span><span class="dv">3</span>, <span class="at">angle=</span><span class="dv">90</span>, <span class="at">length=</span><span class="fl">0.03</span>, <span class="at">col=</span><span class="dv">4</span>)</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>   <span class="fu">points</span>((<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>)<span class="sc">-</span><span class="fl">0.1</span>, gamma, <span class="at">col=</span><span class="dv">1</span>, <span class="at">lwd =</span> <span class="dv">1</span>, <span class="at">pch=</span><span class="dv">16</span>) </span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>   <span class="fu">legend</span>(<span class="dv">7</span>, <span class="dv">1</span>, <span class="fu">c</span>(<span class="st">'Parameter'</span>, <span class="st">'Estimate'</span>), <span class="at">col=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">4</span>), <span class="at">pch=</span><span class="fu">c</span>(<span class="dv">16</span>, <span class="dv">1</span>), <span class="at">cex=</span><span class="fl">0.8</span>) </span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>   })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="do">### colonization</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a> <span class="fu">with</span>(E.col, { <span class="co"># Plot for colonization probability </span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>   <span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, Predicted, <span class="at">pch=</span><span class="dv">1</span>, <span class="at">xaxt=</span><span class="st">'n'</span>, <span class="at">xlab=</span><span class="st">'Year'</span>, <span class="at">ylab=</span><span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">'Colonization probability ( '</span>, gamma, <span class="st">' )'</span>)), <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">col=</span><span class="dv">4</span>) </span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>   <span class="fu">axis</span>(<span class="dv">1</span>, <span class="at">at=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, <span class="at">labels=</span>nd<span class="sc">$</span>year[<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>]) </span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>   <span class="fu">arrows</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, lower, <span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, upper, <span class="at">code=</span><span class="dv">3</span>, <span class="at">angle=</span><span class="dv">90</span>, <span class="at">length=</span><span class="fl">0.03</span>, <span class="at">col=</span><span class="dv">4</span>)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>   <span class="fu">points</span>((<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>)<span class="sc">-</span><span class="fl">0.1</span>, gamma, <span class="at">col=</span><span class="dv">1</span>, <span class="at">lwd =</span> <span class="dv">1</span>, <span class="at">pch=</span><span class="dv">16</span>) </span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>   <span class="fu">legend</span>(<span class="dv">7</span>, <span class="dv">1</span>, <span class="fu">c</span>(<span class="st">'Parameter'</span>, <span class="st">'Estimate'</span>), <span class="at">col=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">4</span>), <span class="at">pch=</span><span class="fu">c</span>(<span class="dv">16</span>, <span class="dv">1</span>), <span class="at">cex=</span><span class="fl">0.8</span>) </span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>   })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="parte3_files/figure-html/unnamed-chunk-10-2.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="parte3_files/figure-html/unnamed-chunk-11-2.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Detection</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(E.det, { <span class="co"># Plot for detection probability: note 10 years </span></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, Predicted, <span class="at">pch=</span><span class="dv">1</span>, <span class="at">xaxt=</span><span class="st">'n'</span>, <span class="at">xlab=</span><span class="st">'Year'</span>, </span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">ylab=</span><span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">'Detection probability ( '</span>, p, <span class="st">' )'</span>)), </span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">col=</span><span class="dv">4</span>) </span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">axis</span>(<span class="dv">1</span>, <span class="at">at=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">labels=</span>nd<span class="sc">$</span>year)</span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrows</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, lower, <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, upper, <span class="at">code=</span><span class="dv">3</span>, <span class="at">angle=</span><span class="dv">90</span>, <span class="at">length=</span><span class="fl">0.03</span>, <span class="at">col=</span><span class="dv">4</span>)</span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">points</span>((<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)<span class="sc">-</span><span class="fl">0.1</span>, p, <span class="at">col=</span><span class="dv">1</span>, <span class="at">lwd =</span> <span class="dv">1</span>, <span class="at">pch=</span><span class="dv">16</span>) </span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">legend</span>(<span class="fl">7.5</span>, <span class="dv">1</span>, <span class="fu">c</span>(<span class="st">'Parameter'</span>,<span class="st">'Estimate'</span>), <span class="at">col=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">4</span>), <span class="at">pch=</span><span class="fu">c</span>(<span class="dv">16</span>, <span class="dv">1</span>), <span class="at">cex=</span><span class="fl">0.8</span>) </span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>  })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Detection</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(E.det, { <span class="co"># Plot for detection probability: note 10 years </span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, Predicted, <span class="at">pch=</span><span class="dv">1</span>, <span class="at">xaxt=</span><span class="st">'n'</span>, <span class="at">xlab=</span><span class="st">'Year'</span>, </span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">ylab=</span><span class="fu">expression</span>(<span class="fu">paste</span>(<span class="st">'Detection probability ( '</span>, p, <span class="st">' )'</span>)), </span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">ylim=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">col=</span><span class="dv">4</span>) </span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">axis</span>(<span class="dv">1</span>, <span class="at">at=</span><span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">labels=</span>nd<span class="sc">$</span>year)</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrows</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, lower, <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, upper, <span class="at">code=</span><span class="dv">3</span>, <span class="at">angle=</span><span class="dv">90</span>, <span class="at">length=</span><span class="fl">0.03</span>, <span class="at">col=</span><span class="dv">4</span>)</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">points</span>((<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)<span class="sc">-</span><span class="fl">0.1</span>, p, <span class="at">col=</span><span class="dv">1</span>, <span class="at">lwd =</span> <span class="dv">1</span>, <span class="at">pch=</span><span class="dv">16</span>) </span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">legend</span>(<span class="fl">7.5</span>, <span class="dv">1</span>, <span class="fu">c</span>(<span class="st">'Parameter'</span>,<span class="st">'Estimate'</span>), <span class="at">col=</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">4</span>), <span class="at">pch=</span><span class="fu">c</span>(<span class="dv">16</span>, <span class="dv">1</span>), <span class="at">cex=</span><span class="fl">0.8</span>) </span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>  })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="parte3_files/figure-html/unnamed-chunk-10-3.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="parte3_files/figure-html/unnamed-chunk-11-3.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># par(op)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># par(op)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="probando-la-bondad-del-ajuste-del-modelo" class="level2">
 <h2 class="anchored" data-anchor-id="probando-la-bondad-del-ajuste-del-modelo">Probando la bondad del ajuste del modelo</h2>
 <p>Además de estimar la varianza de una estimación, la rutina de bootstrap paramétrica se puede usar para evaluar la bondad del ajuste. Para este propósito, una estadística de ajuste, es decir, una que compara los valores observados y esperados se evalúan utilizando el modelo ajustado original y muchos otros modelos ajustados a conjuntos de datos simulados. La simulación produce una aproximación de la distribución de la estadística de ajuste, y un valor P puede calcularse como la proporción de valores simulados mayor que el valor observado. Hosmer y col.&nbsp;(1997) encontraron que un estadístico χ2 funcionó razonablemente bien al evaluar la falta de ajuste para los modelos de regresión logística. No conocemos estudios que evalúen formalmente el desempeño de varias estadísticas de ajuste para modelos de ocupación dinámica, por lo que este enfoque debe considerarse experimental. Las estadísticas de ajuste aplicadas a los historiales de encuentros agregados ofrecen un enfoque alternativo (MacKenzie y Bailey 2004), pero son difíciles de implementar cuando J * T es alto y hay valores faltantes o covariables continuas.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a> chisq <span class="ot">&lt;-</span> <span class="cf">function</span>(fm) { </span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>   umf <span class="ot">&lt;-</span> <span class="fu">getData</span>(fm) </span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>   y <span class="ot">&lt;-</span> <span class="fu">getY</span>(umf) </span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>   sr <span class="ot">&lt;-</span> fm<span class="sc">@</span>sitesRemoved </span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>   <span class="cf">if</span>(<span class="fu">length</span>(sr)<span class="sc">&gt;</span><span class="dv">0</span>) </span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>     y <span class="ot">&lt;-</span> y[<span class="sc">-</span>sr,,drop<span class="ot">=</span><span class="cn">FALSE</span>] </span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>   fv <span class="ot">&lt;-</span> <span class="fu">fitted</span>(fm, <span class="at">na.rm=</span><span class="cn">TRUE</span>) </span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>   y[<span class="fu">is.na</span>(fv)] <span class="ot">&lt;-</span> <span class="cn">NA</span> </span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>   <span class="fu">sum</span>((y<span class="sc">-</span>fv)<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span>(fv<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>fv))) </span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a> }</span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">344</span>) </span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>pb.gof <span class="ot">&lt;-</span> <span class="fu">parboot</span>(m0, <span class="at">statistic=</span>chisq, <span class="at">nsim=</span><span class="dv">100</span>)</span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(pb.gof) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a> chisq <span class="ot">&lt;-</span> <span class="cf">function</span>(fm) { </span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>   umf <span class="ot">&lt;-</span> <span class="fu">getData</span>(fm) </span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>   y <span class="ot">&lt;-</span> <span class="fu">getY</span>(umf) </span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>   sr <span class="ot">&lt;-</span> fm<span class="sc">@</span>sitesRemoved </span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>   <span class="cf">if</span>(<span class="fu">length</span>(sr)<span class="sc">&gt;</span><span class="dv">0</span>) </span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>     y <span class="ot">&lt;-</span> y[<span class="sc">-</span>sr,,drop<span class="ot">=</span><span class="cn">FALSE</span>] </span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>   fv <span class="ot">&lt;-</span> <span class="fu">fitted</span>(fm, <span class="at">na.rm=</span><span class="cn">TRUE</span>) </span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>   y[<span class="fu">is.na</span>(fv)] <span class="ot">&lt;-</span> <span class="cn">NA</span> </span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>   <span class="fu">sum</span>((y<span class="sc">-</span>fv)<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span>(fv<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>fv))) </span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a> }</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">344</span>) </span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>pb.gof <span class="ot">&lt;-</span> <span class="fu">parboot</span>(m0, <span class="at">statistic=</span>chisq, <span class="at">nsim=</span><span class="dv">100</span>)</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(pb.gof) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="parte3_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="parte3_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -618,12 +762,12 @@ psi(.)gam(.)eps(.)p(.)              4 4972.60 193.43 1e-42     1.00</code></pre>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>pkgs <span class="ot">&lt;-</span> <span class="fu">cite_packages</span>(<span class="at">output =</span> <span class="st">"paragraph"</span>, <span class="at">pkgs=</span><span class="st">"Session"</span>, <span class="at">out.dir =</span> <span class="st">"."</span>)</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="co"># knitr::kable(pkgs)</span></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>pkgs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>pkgs <span class="ot">&lt;-</span> <span class="fu">cite_packages</span>(<span class="at">output =</span> <span class="st">"paragraph"</span>, <span class="at">pkgs=</span><span class="st">"Session"</span>, <span class="at">out.dir =</span> <span class="st">"."</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co"># knitr::kable(pkgs)</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>pkgs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p>We used R version 4.4.2 <span class="citation" data-cites="base">[@base]</span> and the following R packages: unmarked v. 1.4.3 <span class="citation" data-cites="unmarked2011 unmarked2023">[@unmarked2011; @unmarked2023]</span>.</p>
+<p>We used R version 4.4.2 <span class="citation" data-cites="base">[@base]</span> and the following R packages: tidyverse v. 2.0.0 <span class="citation" data-cites="tidyverse">[@tidyverse]</span>, unmarked v. 1.4.3 <span class="citation" data-cites="unmarked2011 unmarked2023">[@unmarked2011; @unmarked2023]</span>.</p>
 </div>
 </div>
 </section>
@@ -642,7 +786,7 @@ Note
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">sessionInfo</span>(), <span class="at">locale =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">sessionInfo</span>(), <span class="at">locale =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>R version 4.4.2 (2024-10-31 ucrt)
 Platform: x86_64-w64-mingw32/x64
@@ -655,16 +799,21 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] unmarked_1.4.3  grateful_0.2.10
+[1] unmarked_1.4.3  ggplot2_3.5.1   grateful_0.2.10
 
 loaded via a namespace (and not attached):
- [1] nlme_3.1-166      cli_3.6.3         knitr_1.49        rlang_1.1.4      
- [5] xfun_0.49         jsonlite_1.8.9    minqa_1.2.8       htmltools_0.5.8.1
- [9] lme4_1.1-35.5     rmarkdown_2.29    grid_4.4.2        evaluate_1.0.1   
-[13] MASS_7.3-61       fastmap_1.2.0     yaml_2.3.10       compiler_4.4.2   
-[17] htmlwidgets_1.6.4 Rcpp_1.0.13-1     pbapply_1.7-2     rstudioapi_0.17.1
-[21] lattice_0.22-6    digest_0.6.37     nloptr_2.1.1      parallel_4.4.2   
-[25] splines_4.4.2     Matrix_1.7-1      tools_4.4.2       boot_1.3-31      </code></pre>
+ [1] Matrix_1.7-1      gtable_0.3.6      jsonlite_1.8.9    dplyr_1.1.4      
+ [5] compiler_4.4.2    tidyselect_1.2.1  Rcpp_1.0.13-1     parallel_4.4.2   
+ [9] splines_4.4.2     scales_1.3.0      boot_1.3-31       yaml_2.3.10      
+[13] fastmap_1.2.0     lattice_0.22-6    R6_2.6.1          labeling_0.4.3   
+[17] generics_0.1.3    knitr_1.49        htmlwidgets_1.6.4 MASS_7.3-61      
+[21] tibble_3.2.1      nloptr_2.1.1      munsell_0.5.1     minqa_1.2.8      
+[25] pillar_1.10.1     rlang_1.1.4       xfun_0.49         cli_3.6.3        
+[29] withr_3.0.2       magrittr_2.0.3    digest_0.6.37     grid_4.4.2       
+[33] pbapply_1.7-2     rstudioapi_0.17.1 lme4_1.1-35.5     nlme_3.1-166     
+[37] lifecycle_1.0.4   vctrs_0.6.5       evaluate_1.0.1    glue_1.8.0       
+[41] farver_2.1.2      colorspace_2.1-1  rmarkdown_2.29    tools_4.4.2      
+[45] pkgconfig_2.0.3   htmltools_0.5.8.1</code></pre>
 </div>
 </div>
 </div>
