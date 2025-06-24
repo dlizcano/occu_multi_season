@@ -1,0 +1,93 @@
+---
+title: "parte3"
+description: | 
+  Modelo de ocupación de multies temporadas
+author: 
+  - name: Diego J. Lizcano
+    orcid: https://orcid.org/0000-0002-9648-0576
+date: 24/06/2025
+citation: 
+  url: https://dlizcano.github.io/occu_multi_season/
+  title: "Repaso del modelo de ocupación. Practica"
+google-scholar: true
+html_document:
+    toc: true
+    toc_float: true
+    number_sections: true  
+    theme: united
+    highlight: github
+    code-tools: true
+    code-fold: true
+---
+
+
+
+# Usando datos reales
+
+## Modelando la ocupacion de un venado andino
+
+Comenzamos cargando tres paquetes básicos necesarios para generar nuestros primeros mapas; `mapview`, `sf` y `unmarked`.
+
+```{r}
+#| echo: false
+#| eval: true
+library(grateful) # citation packages
+```
+
+
+```{r}
+#| code-fold: true
+#| warning: false
+#| 
+library(mapview)
+library(unmarked)
+library(sf)
+```
+
+El paquete sf se utiliza para trabajar con datos espaciales y ofrece funciones para leer, escribir y analizar datos espaciales (features en inglés) de una manera sencilla y eficiente.
+
+
+```{r}
+#| code-fold: true
+#| warning: false
+#| 
+library(maps)
+```
+
+
+# Conclusión
+
+Esperamos que haya disfrutado de este curso. 
+
+Recuerde que la práctica es fundamental para desarrollar sus habilidades de R, por lo que le recomendamos que intente hacer de R una parte integral de sus flujos de trabajo. Afortunadamente, con la abundancia de recursos disponibles gratuitamente y la inmensa comunidad de usuarios, ¡aprender R nunca ha sido tan fácil!
+
+
+## Obtenga ayuda
+
+Escribir código consiste en ensayo error y un 90% buscar la respuesta en Google.
+
+Si busca un problema en la web, como "ggplot remove legend", normalmente obtendrá una respuesta bastante decente en Stack Overflow o en un sitio similar.
+
+Si la respuesta aún no existe en línea, regístrese en Stack Overflow y pregúntela usted mismo (pero primer dedique tiempo suficiente en buscar ... ¡nadie quiere ser etiquetado por duplicar una pregunta existente!).
+
+Otra buena idea es buscar un grupo de apoyo local. El uso de R es una experiencia emocional, la curva de aprendizaje al comienzo es bien empinada, la frustración es común, pero luego de un tiempo la alegría de encontrar una solución puede ayudarnos a persistir. Tener a otras personas para ayudar, o simplemente escuchar sus frustraciones es una gran motivación para seguir aprendiendo R.
+
+![](https://media.giphy.com/media/6heBQSjt2IoA8/giphy.gif)
+
+
+## Package Citation
+
+```{r}
+#| code-fold: true
+pkgs <- cite_packages(output = "paragraph", pkgs="Session", out.dir = ".")
+# knitr::kable(pkgs)
+pkgs
+```
+
+## Sesion info
+
+::: {.callout-note collapse="true"}
+```{r}
+print(sessionInfo(), locale = FALSE)
+```
+:::

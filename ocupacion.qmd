@@ -1,0 +1,376 @@
+---
+title: "Ocupación"
+author: "Diego J. Lizcano, Ph.D."
+format:
+  revealjs:
+    incremental: true   
+---
+
+```{r setup, include=FALSE}
+library(fontawesome)
+```
+
+# Gracias a...
+
+## Salvador Mandujano
+
+![](https://perfiles.inecol.mx//images/vertebrados/mandujano/salvador_mandujano2.jpg)
+
+---
+
+# Diego J. Lizcano
+
+![](http://dlizcano.github.io/images/bio-photo5.jpg)
+
+-   Biólogo Universidad de los Andes, Bogotá-Colombia.
+
+-   Ph.D. University of Kent, Canterbury, UK.
+
+-   Ecología y Conservación de Mamíferos .
+
+-   Especie favorita: Tapires.
+
+---
+
+##  {auto-animate="true"}
+
+::: {style="margin-top: 100px;"}
+Tu turno!
+:::
+
+##  {auto-animate="true"}
+
+::: {style="margin-top: 200px; font-size: 3em; color: red;"}
+Tu turno!
+:::
+
+---
+
+# En este Curso:
+
+Vamos a usar:
+
+![](https://www.r-project.org/logo/Rlogo.png)
+
+---
+
+Y les recomiendo tambien usar:
+
+![](https://upload.wikimedia.org/wikipedia/commons/d/d0/RStudio_logo_flat.svg)
+
+---
+
+
+### Ecología: Charles Krebs
+
+![](https://www.zoology.ubc.ca/~krebs/images/charley_cleth.jpg)
+
+---
+
+### Ecología: Study of interactions that determine **Distribution and Abundance**
+
+![](https://m.media-amazon.com/images/I/71qvNstBM0L._SY342_.jpg)
+
+
+---
+
+### - Distribución: 
+
+- Dónde están los organismos? 
+
+### - Abundancia:
+
+- Cuántos organismos hay?
+
+---
+
+# Contar animales no es un problema trivial...
+
+![](https://media.giphy.com/media/11aqMcSy5tsgow/giphy.gif)
+
+Los animales se mueven!
+
+---
+
+### Como ecologo, el mapa de los sueños!
+
+![](img/kanguro.png)
+
+En algún punto tuvimos que contar los canguros
+
+---
+
+# Contar Animales
+
+![](img/pinguinos.jpg)
+
+Fácil para animales conspicuos que no se mueven
+
+---
+
+# Contar Animales
+
+![](img/432.jpg)  
+
+No tan facil si no se agrupan y se dispersan.  Captura-marca-recaptura
+
+---
+
+# Contar Animales
+
+![](img/Moose-capture_011.jpg)
+
+Para algunas especies Captura-marca-recaptura es demasiado costoso o impractico.
+
+---
+
+### Relative abundance
+
+![](img/bird_abundance.jpg)
+
+- An indicator variable of the state of the population
+
+- I don't know how many there are, but I do know where there are more and where there are less.
+
+---
+
+
+# Sin embargo...
+
+![](http://i.giphy.com/nejXhE8hnCiQ0.gif) 
+
+Animals move and hide (camouflage)
+
+---
+
+### Nuestros nuestreos no son infalibles
+
+![](https://i.giphy.com/media/piPn7Cv4KmlVbOSa5c/giphy.webp)
+
+Biologist are not super heroes. We make mistakes!
+
+- Detectability and Imperfect detection concept
+
+---
+
+# Detectability depends of
+
+**This error should be considered carefully to avoid bias in abundance estimates**
+
+1. Sampling conditions (weather, time).
+
+2. The ability of the observer (sensor).
+
+3. The biology of the species being sampled.
+
+
+---
+
+How the detection error occurs (Guillera‐Arroita 2016)
+
+see ppt ![](img/detection.png)
+
+- It is an important error that must be considered in the sampling design!!!
+
+---
+
+# Mackenzie et al 2002, 2003 to the rescue
+
+![](img/mackenzie.png) 
+
+-unnoticed...
+
+---
+
+# Book and presence program 2006
+
+
+![Mackenzie book](img/mackenziebook.jpg)
+---
+
+# Book and presence program 2006
+
+
+![presence software](http://www.mbr-pwrc.usgs.gov/software/doc/presence/falsePos.jpg)
+
+Mackenzie popularizes occupancy $(\psi)$ as a proxy of abundance taking into account detectability $(p)$
+
+---
+
+## Allows you to set goals and to monitor them over time.
+
+![](img/meta.png)
+
+---
+
+#### Occupancy 
+$$\psi$$
+
+#### Detection probability 
+
+$$p$$
+
+- Occupancy is a reflection of other important population parameters such as density.
+
+---
+
+1. $(\psi)$ is the proportion of the sampled area that is occupied by the species.
+
+2. By visiting the site several times I can be more sure that I detect the species when it is found in that place.
+
+3. **Repeated sampling** are key.
+
+4. $(\psi)$ It is influenced by environmental variables (**Covariables**) such as vegetation cover, altitude, precipitation, etc.
+
+---
+
+# This is what a data table with repeated sampling should look like
+
+```{r eval=TRUE, echo=FALSE, warning=FALSE}
+library(knitr)
+muestreo<-c("visit1","visit2", "visit3", "visit4")
+Sitio<-c("site1", "site2", "site3", "sitex")
+mat<-matrix(c(1,0,1,0,
+              0,0,1,0,
+              0,0,0,0,
+              1,0,0,0),nrow=4,ncol = 4)
+colnames(mat)<-muestreo
+rownames(mat)<-Sitio
+kable(mat,booktabs=TRUE,longtable=TRUE)
+```
+
+---
+
+# Example 
+
+calculating $\psi$ and $p$
+Frequentist method (Maximum likelihood)
+
+
+```{r eval=TRUE, echo=FALSE}
+library(knitr)
+muestreo<-c("v 1","v 2", "v 3", "v 4")
+Sitio<-c("s 1", "s 2", "s 3", "s x")
+mat<-matrix(c(1,0,1,0,
+              0,0,1,0,
+              0,0,0,0,
+              1,0,0,0),nrow=4,ncol = 4)
+colnames(mat)<-muestreo
+rownames(mat)<-Sitio
+kable(mat,booktabs=TRUE)
+```
+
+
+# Example 
+
+calculating $\psi$ and $p$
+Frequentist method (Maximum likelihood)
+
+
+| **Detection History**                     |
+|-------------------------------------------|
+| $H_{1} \psi$ × p1(1-p2)(1-p3)p4           |
+| $H_{2} \psi$ × (1-p2)(1-p2)(1-p3)(1-p4)p4 |
+| $H_{3} \psi$ × p1p2(1-p3)(1-p4)           |
+| $H_{4} \psi$ × (1-p2)(1-p2)(1-p3)(1-p4)p4 |
+
+
+---
+
+### Histories Combined in a Model:
+
+$$
+\begin{aligned}
+L(\psi, p \mid H_{1},...,H_{x}) =  \prod_{i=1}^{x} Pr (H_{i})
+\end{aligned}
+$$ 
+
+The model admits incorporating covariates to explain $\psi$ and $p$
+
+
+---
+
+# Bayesian method
+
+calculating $\psi$ and $p$
+
+It is important to understand that there are two processes that can be modeled hierarchically
+
+- The ecological process ($\psi$) follows a Bernoulli distribution.
+- The observation model ($p$) follows a Bernoulli distribution.
+
+The probability of observing the species given that it is present:
+
+$p = Pr(y_{i}=1 \mid z_{i}=1)$
+
+The Occupancy probability: $\psi =Pr(z_{i}=1)$
+
+
+
+---
+
+### A hierarchical (Bayesian) model
+
+![](img/Occu_Bayes.png)
+
+- Admits Covariates
+
+---
+
+## Which one should I use? The maximum likelihood or Bayesian?
+
+#### maximum likelihood
+
+-   Package [unmarked](https://cran.r-project.org/web/packages/unmarked/index.html)
+-   In R
+-   Admits "automatic" model selection AIC
+-   Problems with many NAs
+-   Hesian problem. estimates ok.
+-   Difficulty from 1 to 10: 3 if you already know R.
+
+---
+
+## Which one should I use? The maximum likelihood or Bayesian?
+
+#### Bayesian
+
+ - BUGS or Stan language, called from R - Model selection is not that easy, BIC is not suitable - You don't have as many problems with many NAs in the matrix - Estimates are more accurate. - Difficulty from 1 to 10: 7 if you already know R.
+
+- New: Package UBMS
+
+---
+
+# Going Deep
+
+Dragon-fly book (2015)
+
+![](https://images-na.ssl-images-amazon.com/images/I/513ulKHhAKL._SX404_BO1,204,203,200_.jpg)
+
+by Marc Kery. More than 700 pages clearly explaining where the theory comes from, in a tutorial style, starting with a basic level of R to advanced models and their implementation in R and the BUGS language.
+
+---
+
+Dragon-fly book Vol. 2 (2020)
+
+![](https://secure-ecsd.elsevier.com/covers/80/Tango2/large/9780128097274.jpg)
+Dynamic and Advanced Models provides a synthesis of the state-of-the-art in hierarchical models for plant and animal distribution, also focusing on the complex and more advanced models currently available. The book explains all procedures in the context of hierarchical models that represent a unified approach to ecological research, thus taking the reader from design, through data collection, and into analyses using a very powerful way of synthesizing data.
+
+---
+
+# Thanks!
+
+Slides created via Quarto.
+  
+Contact: Diego J. Lizcano
+
+<a href="http://twitter.com/dlizcano"> `r fa("twitter", fill = "steelblue")`
+<a href="http://github.com/dlizcano"> `r fa("github", fill = "black")`
+
+---
+
+Manos a la obra...
+
+![](img/baby-84626_1280.jpg)
+
+---
+

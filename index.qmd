@@ -1,0 +1,102 @@
+---
+project:
+  type: website
+
+website:
+  title: "Modelado de la Ocupación, abundancia y densidad de poblaciones"
+  subtitle: "Modelo de ocupación de multiples temporadas"
+  author: "Diego J. Lizcano"
+  citation: 
+    url: https://dlizcano.github.io/occu_multi_season/
+  google-scholar: true
+  bibliography: grateful-refs.bib
+  license: CC BY-SA
+  page-navigation: true
+  navbar:
+    right:
+      - icon: github
+        href: https://github.com/dlizcano/occu_multi_season
+        aria-label: GitHub
+        
+execute: 
+  echo: true
+  eval: true
+  warning: false
+  error: false
+  output: asis
+  
+  
+format: 
+  html: 
+    code-fold: true
+    code-summary: "codigo R"
+    highlight-style: breezedark
+    fig-width: 8
+    fig-height: 6
+---
+
+## Estructura del curso
+
+Este es un curso de 4 horas parte del curso Modelado de la Ocupación, abundancia y densidad de poblaciones: enfoque frecuentista y bayesiano en R.\
+[![imagen](img/cursoSalvador.jpg)](https://drive.google.com/file/d/1Y8SmvqlkfX6XP6dkvDigPxM-tU4npx-MuIPkR_hmAlo/view?fbclid=IwY2xjawLHQAVleHRuA2FlbQIxMABicmlkETF2OFJ2ckVudEtyUjJrWGZTAR5iCiJ_NK3WInIy93uotCKgW4K9oDYGklxwZnivqtJUO_BdhFWDW9EL4fcYWg_aem_8jZ7ErEUPZIXcd2ZRIVfDg)
+
+```{r}
+#| echo: false
+#| eval: true
+library(grateful) # citation packages
+```
+
+
+### Parte 1
+
+Repaso del concepto de ocupación.
+
+### Parte 2 
+
+Repaso de los modelos de ocupación de una temporada.
+
+### Parte 3
+
+Modelo de ocupacion de multiples temporadas.
+
+### Requisitos
+
+Computador con acceso a Internet. Contar con R y RStudio previamente instalados. La instalación del programa no se explicará durante el curso.
+
+Antes del curso instalar los paquetes:
+
+```{r}
+#| eval: false
+#| 
+install.packages("tidyverse")
+install.packages("sf")
+install.packages("terra")
+install.packages("mapview")
+install.packages("elevatr")
+install.packages("unmarked")
+
+```
+
+La experiencia requerida en R es mínima, sin embargo, se espera que los participantes estén familiarizados con los objetos básicos de R: vectores, dataframes y listas. Asi como la forma de indexarlos. Puedes ver, aprender o repasar el manejo básico de R en  este tutorial.  
+
+[![](img/tutorialR.jpg)](https://dlizcano.github.io/IntroR)
+
+También se requiere, un conocimiento básico sobre conceptos relacionados con mapas sistemas de coordenadas y proyecciones geográficas, aunque no es esencial.
+
+
+## Package Citation
+
+```{r}
+#| code-fold: true
+pkgs <- cite_packages(output = "paragraph", pkgs="Session", out.dir = ".")
+# knitr::kable(pkgs)
+pkgs
+```
+
+## Sesion info
+
+::: {.callout-note collapse="true"}
+```{r}
+print(sessionInfo(), locale = FALSE)
+```
+:::

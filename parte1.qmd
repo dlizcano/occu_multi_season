@@ -1,0 +1,83 @@
+---
+title: "parte1"
+description: | 
+  Repaso del concepto de ocupación. 
+author: 
+  - name: Diego J. Lizcano
+    orcid: https://orcid.org/0000-0002-9648-0576
+date: 24/06/2025
+citation: 
+  url: https://dlizcano.github.io/occu_multi_season/
+  title: "El concepto de ocupación"
+google-scholar: true
+html_document:
+    toc: true
+    toc_float: true
+    number_sections: true  
+    theme: united
+    highlight: github
+    code-tools: true
+    code-fold: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Antes de comenzar
+
+```{r}
+#| echo: false
+#| eval: true
+library(grateful) # citation packages
+```
+
+
+### Datos y organización general
+
+En primer lugar, es importante recordar que la organización es clave cuando se está generando un nuevo código. En este sentido, le recomendamos que cree una carpeta en su disco duro (C:) para cada nuevo proyecto. Puede hacer esto como un proyecto de Rstudio; para esto diríjase a: Archivo\> Nuevo proyecto o simplemente cree una nueva carpeta en su explorador y establezca su directorio de trabajo allí. Dentro de esta carpeta, cree una carpeta de datos donde guardará sus datos sin procesar. Puede almacenar algunos objetos intermedios en otra subcarpeta. También cree una carpeta para su código R y una carpeta para guardar sus figuras.
+
+la organización de carpetas que se sugere es:
+
+C://curso\
+- data\
+- R\
+- fig
+
+## Objetivo 
+Presentar una introducción a los conceptos de monitoreo de biodiversidad usando modelos de ocupación, con estimadores de máxima verosimilitud y bayesianos.  
+
+### Prerrequisitos 
+Conocimientos de estadística básica (probabilidad y regresiones), manejo básico de R (objetos, vectores, data frame, matrices y funciones). Es importante que los participantes estén familiarizados con R.
+
+
+### Introducción (Teórico, 1 horas) 
+
+El problema de contar organismos en ecología, censos, muestreos, poblaciones y tamaño poblacional. La densidad, la abundancia y la ocupación. 
+
+
+> Tenga en cuenta que se requiere conexión a internet y que podemos estar descargando algunos datos desde GitHub...
+
+
+# Presentación 
+
+[![image](img/Occu_Bayes.png](https://dlizcano.github.io/occu_multi_season/ocupacion.html)
+
+
+## Package Citation
+
+```{r}
+#| code-fold: true
+pkgs <- cite_packages(output = "paragraph", pkgs="Session", out.dir = ".")
+# knitr::kable(pkgs)
+pkgs
+```
+
+## Sesion info
+
+::: {.callout-note collapse="true"}
+```{r}
+print(sessionInfo(), locale = FALSE)
+```
+:::
+
