@@ -244,16 +244,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Usando datos reales</h1>
 <section id="modelando-la-ocupacion-de-un-venado-andino" class="level2">
 <h2 class="anchored" data-anchor-id="modelando-la-ocupacion-de-un-venado-andino">Modelando la ocupacion de un venado andino</h2>
-<p>Comenzamos cargando tres paquetes básicos necesarios para generar nuestros primeros mapas; <code>mapview</code>, <code>sf</code> y <code>unmarked</code>.</p>
+<p>Comenzamos cargando tres paquetes básicos necesarios para generar nuestros primeros modelos <code>unmarked</code>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mapview)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(unmarked)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(unmarked)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>El paquete sf se utiliza para trabajar con datos espaciales y ofrece funciones para leer, escribir y analizar datos espaciales (features en inglés) de una manera sencilla y eficiente.</p>
+<p>Modelo de Ocupación Diámico con datos simulados Primero generamos un conjunto de datos simple y simulado con valores específicos de año específicos para los parámetros, así como especificaciones de diseño, es decir, número de sitios, años y encuestas por año.</p>
+<p>Luego, veremos cómo ajustar un modelo de ocupación dinámico con dependencia del año en los parámetros de probabilidad de colonización, extinción y detección.</p>
+<p>Simulando, formateando y resumiendo datos Para simular los datos, ejecutamos el siguiente código R. Los valores reales para estos parámetros para cada año se extraen aleatoriamente de una distribución uniforme con los límites especificados.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -284,7 +284,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>pkgs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p>We used R version 4.4.2 <span class="citation" data-cites="base">[@base]</span> and the following R packages: maps v. 3.4.2.1 <span class="citation" data-cites="maps">[@maps]</span>, mapview v. 2.11.2 <span class="citation" data-cites="mapview">[@mapview]</span>, sf v. 1.0.19 <span class="citation" data-cites="sf2018 sf2023">[@sf2018; @sf2023]</span>, unmarked v. 1.4.3 <span class="citation" data-cites="unmarked2011 unmarked2023">[@unmarked2011; @unmarked2023]</span>.</p>
+<p>We used R version 4.4.2 <span class="citation" data-cites="base">[@base]</span> and the following R packages: maps v. 3.4.2.1 <span class="citation" data-cites="maps">[@maps]</span>, unmarked v. 1.4.3 <span class="citation" data-cites="unmarked2011 unmarked2023">[@unmarked2011; @unmarked2023]</span>.</p>
 </div>
 </div>
 </section>
@@ -316,22 +316,14 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] maps_3.4.2.1    sf_1.0-19       unmarked_1.4.3  mapview_2.11.2 
-[5] grateful_0.2.10
+[1] maps_3.4.2.1    unmarked_1.4.3  grateful_0.2.10
 
 loaded via a namespace (and not attached):
- [1] class_7.3-22       KernSmooth_2.23-24 lattice_0.22-6     digest_0.6.37     
- [5] magrittr_2.0.3     evaluate_1.0.1     grid_4.4.2         fastmap_1.2.0     
- [9] jsonlite_1.8.9     e1071_1.7-16       DBI_1.2.3          crosstalk_1.2.1   
-[13] scales_1.3.0       codetools_0.2-20   cli_3.6.3          rlang_1.1.4       
-[17] units_0.8-5        munsell_0.5.1      base64enc_0.1-3    yaml_2.3.10       
-[21] tools_4.4.2        raster_3.6-30      parallel_4.4.2     colorspace_2.1-1  
-[25] R6_2.6.1           png_0.1-8          stats4_4.4.2       proxy_0.4-27      
-[29] lifecycle_1.0.4    classInt_0.4-10    leaflet_2.2.2      htmlwidgets_1.6.4 
-[33] MASS_7.3-61        terra_1.8-21       glue_1.8.0         Rcpp_1.0.13-1     
-[37] xfun_0.49          rstudioapi_0.17.1  knitr_1.49         htmltools_0.5.8.1 
-[41] rmarkdown_2.29     leafem_0.2.3       satellite_1.0.5    compiler_4.4.2    
-[45] sp_2.1-4          </code></pre>
+ [1] digest_0.6.37     fastmap_1.2.0     xfun_0.49         lattice_0.22-6   
+ [5] parallel_4.4.2    knitr_1.49        htmltools_0.5.8.1 rmarkdown_2.29   
+ [9] cli_3.6.3         grid_4.4.2        compiler_4.4.2    rstudioapi_0.17.1
+[13] tools_4.4.2       evaluate_1.0.1    Rcpp_1.0.13-1     yaml_2.3.10      
+[17] rlang_1.1.4       jsonlite_1.8.9    htmlwidgets_1.6.4 MASS_7.3-61      </code></pre>
 </div>
 </div>
 </div>

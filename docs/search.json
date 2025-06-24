@@ -11,14 +11,14 @@
     "href": "about.html",
     "title": "About",
     "section": "",
-    "text": "Diego J. Lizcano, Ph.D. Sociedad Colombiana de Mastozoología (SCMas)\nAndres Felipe Suárez-Castro, Ph.D. Griffith University: Brisbane, Australia."
+    "text": "Diego J. Lizcano, Ph.D.. Wildlife Conservation Society (WCS) y Sociedad Colombiana de Mastozoología (SCMas)"
   },
   {
     "objectID": "about.html#créditos",
     "href": "about.html#créditos",
     "title": "About",
     "section": "Créditos",
-    "text": "Créditos\nEste mini curso es una versión ligera del fantástico curso Introducción al procesamiento, visualización y mapeo de datos espaciales en R preparado por el Dr. Andres Felipe Suárez-Castro.\nAlgunos ejercicios presentados en este curso fueron adaptados del curso desarrollado por C.J. Brown, D. Schoeman, A.J. Richardson y B. Venables, el cual se encuentra disponible en: https://www.seascapemodels.org/code.html."
+    "text": "Créditos\nEste mini curso es una parte del curso: Introducción al procesamiento, visualización y análisis de datos espaciales en R. coordinado por el Dr. Salvador Mandujano.\nCon este curso pretendemos presentar una introducción a los conceptos de monitoreo de biodiversidad usando modelos de ocupación, con estimadores de máxima verosimilitud y bayesianos.\nAlgunos ejercicios presentados en este curso fueron adaptados del taller - tutorial: Simulación y análisis de ocupación. Entendiendo las simulaciones y el modelo básico de ocupación."
   },
   {
     "objectID": "AM.html",
@@ -242,14 +242,14 @@
     "href": "parte3.html",
     "title": "parte3",
     "section": "",
-    "text": "Comenzamos cargando tres paquetes básicos necesarios para generar nuestros primeros mapas; mapview, sf y unmarked.\n\n\nCode\nlibrary(mapview)\nlibrary(unmarked)\nlibrary(sf)\n\n\nEl paquete sf se utiliza para trabajar con datos espaciales y ofrece funciones para leer, escribir y analizar datos espaciales (features en inglés) de una manera sencilla y eficiente.\n\n\nCode\nlibrary(maps)"
+    "text": "Comenzamos cargando tres paquetes básicos necesarios para generar nuestros primeros modelos unmarked.\n\n\nCode\nlibrary(unmarked)\n\n\nModelo de Ocupación Diámico con datos simulados Primero generamos un conjunto de datos simple y simulado con valores específicos de año específicos para los parámetros, así como especificaciones de diseño, es decir, número de sitios, años y encuestas por año.\nLuego, veremos cómo ajustar un modelo de ocupación dinámico con dependencia del año en los parámetros de probabilidad de colonización, extinción y detección.\nSimulando, formateando y resumiendo datos Para simular los datos, ejecutamos el siguiente código R. Los valores reales para estos parámetros para cada año se extraen aleatoriamente de una distribución uniforme con los límites especificados.\n\n\nCode\nlibrary(maps)"
   },
   {
     "objectID": "parte3.html#modelando-la-ocupacion-de-un-venado-andino",
     "href": "parte3.html#modelando-la-ocupacion-de-un-venado-andino",
     "title": "parte3",
     "section": "",
-    "text": "Comenzamos cargando tres paquetes básicos necesarios para generar nuestros primeros mapas; mapview, sf y unmarked.\n\n\nCode\nlibrary(mapview)\nlibrary(unmarked)\nlibrary(sf)\n\n\nEl paquete sf se utiliza para trabajar con datos espaciales y ofrece funciones para leer, escribir y analizar datos espaciales (features en inglés) de una manera sencilla y eficiente.\n\n\nCode\nlibrary(maps)"
+    "text": "Comenzamos cargando tres paquetes básicos necesarios para generar nuestros primeros modelos unmarked.\n\n\nCode\nlibrary(unmarked)\n\n\nModelo de Ocupación Diámico con datos simulados Primero generamos un conjunto de datos simple y simulado con valores específicos de año específicos para los parámetros, así como especificaciones de diseño, es decir, número de sitios, años y encuestas por año.\nLuego, veremos cómo ajustar un modelo de ocupación dinámico con dependencia del año en los parámetros de probabilidad de colonización, extinción y detección.\nSimulando, formateando y resumiendo datos Para simular los datos, ejecutamos el siguiente código R. Los valores reales para estos parámetros para cada año se extraen aleatoriamente de una distribución uniforme con los límites especificados.\n\n\nCode\nlibrary(maps)"
   },
   {
     "objectID": "parte3.html#obtenga-ayuda",
@@ -263,14 +263,14 @@
     "href": "parte3.html#package-citation",
     "title": "parte3",
     "section": "Package Citation",
-    "text": "Package Citation\n\n\nCode\npkgs &lt;- cite_packages(output = \"paragraph\", pkgs=\"Session\", out.dir = \".\")\n# knitr::kable(pkgs)\npkgs\n\n\nWe used R version 4.4.2 [@base] and the following R packages: maps v. 3.4.2.1 [@maps], mapview v. 2.11.2 [@mapview], sf v. 1.0.19 [@sf2018; @sf2023], unmarked v. 1.4.3 [@unmarked2011; @unmarked2023]."
+    "text": "Package Citation\n\n\nCode\npkgs &lt;- cite_packages(output = \"paragraph\", pkgs=\"Session\", out.dir = \".\")\n# knitr::kable(pkgs)\npkgs\n\n\nWe used R version 4.4.2 [@base] and the following R packages: maps v. 3.4.2.1 [@maps], unmarked v. 1.4.3 [@unmarked2011; @unmarked2023]."
   },
   {
     "objectID": "parte3.html#sesion-info",
     "href": "parte3.html#sesion-info",
     "title": "parte3",
     "section": "Sesion info",
-    "text": "Sesion info\n\n\n\n\n\n\nNote\n\n\n\n\n\n\nprint(sessionInfo(), locale = FALSE)\n\nR version 4.4.2 (2024-10-31 ucrt)\nPlatform: x86_64-w64-mingw32/x64\nRunning under: Windows 10 x64 (build 19045)\n\nMatrix products: default\n\n\nattached base packages:\n[1] stats     graphics  grDevices utils     datasets  methods   base     \n\nother attached packages:\n[1] maps_3.4.2.1    sf_1.0-19       unmarked_1.4.3  mapview_2.11.2 \n[5] grateful_0.2.10\n\nloaded via a namespace (and not attached):\n [1] class_7.3-22       KernSmooth_2.23-24 lattice_0.22-6     digest_0.6.37     \n [5] magrittr_2.0.3     evaluate_1.0.1     grid_4.4.2         fastmap_1.2.0     \n [9] jsonlite_1.8.9     e1071_1.7-16       DBI_1.2.3          crosstalk_1.2.1   \n[13] scales_1.3.0       codetools_0.2-20   cli_3.6.3          rlang_1.1.4       \n[17] units_0.8-5        munsell_0.5.1      base64enc_0.1-3    yaml_2.3.10       \n[21] tools_4.4.2        raster_3.6-30      parallel_4.4.2     colorspace_2.1-1  \n[25] R6_2.6.1           png_0.1-8          stats4_4.4.2       proxy_0.4-27      \n[29] lifecycle_1.0.4    classInt_0.4-10    leaflet_2.2.2      htmlwidgets_1.6.4 \n[33] MASS_7.3-61        terra_1.8-21       glue_1.8.0         Rcpp_1.0.13-1     \n[37] xfun_0.49          rstudioapi_0.17.1  knitr_1.49         htmltools_0.5.8.1 \n[41] rmarkdown_2.29     leafem_0.2.3       satellite_1.0.5    compiler_4.4.2    \n[45] sp_2.1-4"
+    "text": "Sesion info\n\n\n\n\n\n\nNote\n\n\n\n\n\n\nprint(sessionInfo(), locale = FALSE)\n\nR version 4.4.2 (2024-10-31 ucrt)\nPlatform: x86_64-w64-mingw32/x64\nRunning under: Windows 10 x64 (build 19045)\n\nMatrix products: default\n\n\nattached base packages:\n[1] stats     graphics  grDevices utils     datasets  methods   base     \n\nother attached packages:\n[1] maps_3.4.2.1    unmarked_1.4.3  grateful_0.2.10\n\nloaded via a namespace (and not attached):\n [1] digest_0.6.37     fastmap_1.2.0     xfun_0.49         lattice_0.22-6   \n [5] parallel_4.4.2    knitr_1.49        htmltools_0.5.8.1 rmarkdown_2.29   \n [9] cli_3.6.3         grid_4.4.2        compiler_4.4.2    rstudioapi_0.17.1\n[13] tools_4.4.2       evaluate_1.0.1    Rcpp_1.0.13-1     yaml_2.3.10      \n[17] rlang_1.1.4       jsonlite_1.8.9    htmlwidgets_1.6.4 MASS_7.3-61"
   },
   {
     "objectID": "parte2.html",
@@ -298,14 +298,14 @@
     "href": "parte2.html#package-citation",
     "title": "parte2",
     "section": "Package Citation",
-    "text": "Package Citation\n\n\nCode\npkgs &lt;- cite_packages(output = \"paragraph\", pkgs=\"Session\", out.dir = \".\")\n# knitr::kable(pkgs)\npkgs\n\n\nWe used R version 4.4.2 [@base] and the following R packages: DT v. 0.33 [@DT], elevatr v. 0.99.0 [@elevatr], maps v. 3.4.2.1 [@maps], mapview v. 2.11.2 [@mapview], sf v. 1.0.19 [@sf2018; @sf2023], terra v. 1.8.21 [@terra], tidyverse v. 2.0.0 [@tidyverse], unmarked v. 1.4.3 [@unmarked2011; @unmarked2023]."
+    "text": "Package Citation\n\n\nCode\npkgs &lt;- cite_packages(output = \"paragraph\", pkgs=\"Session\", out.dir = \".\")\n# knitr::kable(pkgs)\npkgs\n\n\nWe used R version 4.4.2 [@base] and the following R packages: DT v. 0.33 [@DT], elevatr v. 0.99.0 [@elevatr], maps v. 3.4.2.1 [@maps], mapview v. 2.11.2 [@mapview], RColorBrewer v. 1.1.3 [@RColorBrewer], sf v. 1.0.19 [@sf2018; @sf2023], terra v. 1.8.21 [@terra], tidyverse v. 2.0.0 [@tidyverse], unmarked v. 1.4.3 [@unmarked2011; @unmarked2023]."
   },
   {
     "objectID": "parte2.html#sesion-info",
     "href": "parte2.html#sesion-info",
     "title": "parte2",
     "section": "Sesion info",
-    "text": "Sesion info\n\n\n\n\n\n\nNote\n\n\n\n\n\n\nprint(sessionInfo(), locale = FALSE)\n\nR version 4.4.2 (2024-10-31 ucrt)\nPlatform: x86_64-w64-mingw32/x64\nRunning under: Windows 10 x64 (build 19045)\n\nMatrix products: default\n\n\nattached base packages:\n[1] stats     graphics  grDevices utils     datasets  methods   base     \n\nother attached packages:\n[1] maps_3.4.2.1    elevatr_0.99.0  terra_1.8-21    unmarked_1.4.3 \n[5] DT_0.33         readr_2.1.5     sf_1.0-19       mapview_2.11.2 \n[9] grateful_0.2.10\n\nloaded via a namespace (and not attached):\n [1] bslib_0.8.0        xfun_0.49          raster_3.6-30      htmlwidgets_1.6.4 \n [5] lattice_0.22-6     tzdb_0.4.0         vctrs_0.6.5        tools_4.4.2       \n [9] crosstalk_1.2.1    curl_6.0.0         stats4_4.4.2       parallel_4.4.2    \n[13] tibble_3.2.1       proxy_0.4-27       pkgconfig_2.0.3    KernSmooth_2.23-24\n[17] satellite_1.0.5    leaflet_2.2.2      lifecycle_1.0.4    compiler_4.4.2    \n[21] progress_1.2.3     munsell_0.5.1      codetools_0.2-20   sass_0.4.9        \n[25] htmltools_0.5.8.1  class_7.3-22       yaml_2.3.10        jquerylib_0.1.4   \n[29] pillar_1.10.1      crayon_1.5.3       MASS_7.3-61        slippymath_0.3.1  \n[33] classInt_0.4-10    cachem_1.1.0       tidyselect_1.2.1   digest_0.6.37     \n[37] purrr_1.0.2        fastmap_1.2.0      grid_4.4.2         colorspace_2.1-1  \n[41] cli_3.6.3          magrittr_2.0.3     base64enc_0.1-3    leafem_0.2.3      \n[45] e1071_1.7-16       prettyunits_1.2.0  scales_1.3.0       sp_2.1-4          \n[49] bit64_4.5.2        httr_1.4.7         rmarkdown_2.29     bit_4.5.0.1       \n[53] progressr_0.15.0   png_0.1-8          hms_1.1.3          evaluate_1.0.1    \n[57] knitr_1.49         rlang_1.1.4        Rcpp_1.0.13-1      glue_1.8.0        \n[61] DBI_1.2.3          rstudioapi_0.17.1  vroom_1.6.5        jsonlite_1.8.9    \n[65] R6_2.6.1           units_0.8-5"
+    "text": "Sesion info\n\n\n\n\n\n\nNote\n\n\n\n\n\n\nprint(sessionInfo(), locale = FALSE)\n\nR version 4.4.2 (2024-10-31 ucrt)\nPlatform: x86_64-w64-mingw32/x64\nRunning under: Windows 10 x64 (build 19045)\n\nMatrix products: default\n\n\nattached base packages:\n[1] stats     graphics  grDevices utils     datasets  methods   base     \n\nother attached packages:\n [1] RColorBrewer_1.1-3 maps_3.4.2.1       elevatr_0.99.0     terra_1.8-21      \n [5] unmarked_1.4.3     DT_0.33            readr_2.1.5        sf_1.0-19         \n [9] mapview_2.11.2     grateful_0.2.10   \n\nloaded via a namespace (and not attached):\n [1] tidyselect_1.2.1        farver_2.1.2            fastmap_1.2.0          \n [4] leaflet_2.2.2           digest_0.6.37           lifecycle_1.0.4        \n [7] magrittr_2.0.3          compiler_4.4.2          rlang_1.1.4            \n[10] sass_0.4.9              progress_1.2.3          tools_4.4.2            \n[13] yaml_2.3.10             knitr_1.49              prettyunits_1.2.0      \n[16] htmlwidgets_1.6.4       bit_4.5.0.1             sp_2.1-4               \n[19] classInt_0.4-10         curl_6.0.0              abind_1.4-8            \n[22] KernSmooth_2.23-24      purrr_1.0.2             grid_4.4.2             \n[25] stats4_4.4.2            e1071_1.7-16            leafem_0.2.3           \n[28] colorspace_2.1-1        progressr_0.15.0        scales_1.3.0           \n[31] MASS_7.3-61             cli_3.6.3               rmarkdown_2.29         \n[34] crayon_1.5.3            rstudioapi_0.17.1       httr_1.4.7             \n[37] tzdb_0.4.0              minqa_1.2.8             DBI_1.2.3              \n[40] pbapply_1.7-2           cachem_1.1.0            proxy_0.4-27           \n[43] splines_4.4.2           stars_0.6-8             slippymath_0.3.1       \n[46] parallel_4.4.2          base64enc_0.1-3         vctrs_0.6.5            \n[49] boot_1.3-31             Matrix_1.7-1            jsonlite_1.8.9         \n[52] hms_1.1.3               bit64_4.5.2             crosstalk_1.2.1        \n[55] jquerylib_0.1.4         units_0.8-5             glue_1.8.0             \n[58] nloptr_2.1.1            leaflet.providers_2.0.0 codetools_0.2-20       \n[61] raster_3.6-30           lme4_1.1-35.5           munsell_0.5.1          \n[64] tibble_3.2.1            pillar_1.10.1           htmltools_0.5.8.1      \n[67] satellite_1.0.5         R6_2.6.1                vroom_1.6.5            \n[70] evaluate_1.0.1          lattice_0.22-6          png_0.1-8              \n[73] bslib_0.8.0             class_7.3-22            Rcpp_1.0.13-1          \n[76] nlme_3.1-166            xfun_0.49               pkgconfig_2.0.3"
   },
   {
     "objectID": "parte1.html",
@@ -355,5 +355,61 @@
     "title": "Modelado de la Ocupación, abundancia y densidad de poblaciones",
     "section": "Sesion info",
     "text": "Sesion info\n\n\n\n\n\n\nNote\n\n\n\n\n\n\ncodigo R\nprint(sessionInfo(), locale = FALSE)\n\nR version 4.4.2 (2024-10-31 ucrt) Platform: x86_64-w64-mingw32/x64 Running under: Windows 10 x64 (build 19045)\nMatrix products: default\nattached base packages: [1] stats graphics grDevices utils datasets methods base\nother attached packages: [1] grateful_0.2.10\nloaded via a namespace (and not attached): [1] htmlwidgets_1.6.4 compiler_4.4.2 fastmap_1.2.0 cli_3.6.3\n[5] tools_4.4.2 htmltools_0.5.8.1 rstudioapi_0.17.1 yaml_2.3.10\n[9] rmarkdown_2.29 knitr_1.49 jsonlite_1.8.9 xfun_0.49\n[13] digest_0.6.37 rlang_1.1.4 evaluate_1.0.1"
+  },
+  {
+    "objectID": "parte2.html#objeto-umf",
+    "href": "parte2.html#objeto-umf",
+    "title": "parte2",
+    "section": "objeto umf",
+    "text": "objeto umf\n\n#############\n# Occu analisys\n\n# Make unmarked frame\numf_y_full&lt;- unmarkedFrameOccu(y= y_full[,1:108])\nsiteCovs(umf_y_full) &lt;- full_covs_s # data.frame(Elev=full_covs$Elev) # Full\n#######Graficar umf\nplot(umf_y_full)"
+  },
+  {
+    "objectID": "parte2.html#posibles-modelos",
+    "href": "parte2.html#posibles-modelos",
+    "title": "parte2",
+    "section": "Posibles modelos",
+    "text": "Posibles modelos\n\n# build  models\nmf0&lt;-occu(~1 ~ 1, umf_y_full)\nmf1&lt;-occu(~1 ~ elevation, umf_y_full)\nmf2&lt;-occu(~1 ~ elevation +I(elevation^2), umf_y_full)\nmf3&lt;-occu(~1 ~ slope, umf_y_full)\nmf4&lt;-occu(~1 ~ aspect, umf_y_full)\nmf5&lt;-occu(~1 ~ roughness, umf_y_full, starts = c(0.6, -3, 0))\nmf6&lt;-occu(~elevation +I(elevation^2) ~ elevation +I(elevation^2), umf_y_full)\nmf7&lt;-occu(~roughness ~ elevation +I(elevation^2), umf_y_full)\nmf8&lt;-occu(~slope ~ elevation +I(elevation^2), umf_y_full)\n\n\n# fit list\nfms1&lt;-fitList(\"p(.) Ocu(.)\"=mf0,\n              \"p(.) Ocu(elev)\"=mf1,\n              \"p(.) Ocu(elev^2)\"=mf2,\n              \"p(.) Ocu(slope)\"=mf3,\n              \"p(.) Ocu(aspect)\"=mf4,\n              \"p(.) Ocu(roughness)\"=mf5,\n              \"p(elev^2) Ocu(elev^2)\"=mf6,\n              \"p(roughness) Ocu(elev^2)\"=mf7,\n              \"p(slope) Ocu(elev^2)\"=mf8\n)\n\n\nmodSel(fms1)\n\nWarning in sqrt(diag(vcov(x, altNames = TRUE))): Se han producido NaNs\n\n\n                         nPars    AIC delta   AICwt cumltvWt\np(.) Ocu(elev^2)             4 366.56  0.00 4.0e-01     0.40\np(roughness) Ocu(elev^2)     5 368.18  1.61 1.8e-01     0.57\np(slope) Ocu(elev^2)         5 368.40  1.83 1.6e-01     0.73\np(.) Ocu(aspect)             3 369.19  2.62 1.1e-01     0.84\np(.) Ocu(elev)               3 369.31  2.74 1.0e-01     0.94\np(elev^2) Ocu(elev^2)        6 370.40  3.84 5.8e-02     1.00\np(.) Ocu(slope)              3 376.97 10.41 2.2e-03     1.00\np(.) Ocu(roughness)          3 377.77 11.21 1.5e-03     1.00\np(.) Ocu(.)                  2 417.05 50.49 4.3e-12     1.00"
+  },
+  {
+    "objectID": "parte2.html#bondad-de-ajuste",
+    "href": "parte2.html#bondad-de-ajuste",
+    "title": "parte2",
+    "section": "Bondad de ajuste",
+    "text": "Bondad de ajuste\n\n# print(fms1)\n\npb_f &lt;- parboot(mf7, nsim=500, report=10) \n\nWarning: report argument is non-functional and will be deprecated in the next\nversion"
+  },
+  {
+    "objectID": "parte2.html#plot-detección-en-escala-original",
+    "href": "parte2.html#plot-detección-en-escala-original",
+    "title": "parte2",
+    "section": "plot Detección en escala original",
+    "text": "plot Detección en escala original\n\nnewdat_range&lt;-data.frame(elevation=seq(min(full_covs_s$elevation),\n                                       max(full_covs_s$elevation),length=100), \n                         roughness=seq(min(full_covs_s$roughness),\n                                       max(full_covs_s$roughness), length=100))\n\n\npred_det &lt;-predict(mf7, type=\"det\", newdata=newdat_range, appendData=TRUE)\n\n\n\n## plot Detection en escala original\npred_det &lt;-predict(mf7, type=\"det\", newdata=newdat_range, appendData=TRUE)\nplot(Predicted~roughness, pred_det,type=\"l\",col=\"blue\", \n     xlab=\"Roughness\",\n     ylab=\"Detection Probability\",\n     xaxt=\"n\")\nxticks &lt;- c(-1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3) # -1:2\nxlabs &lt;- xticks*sd(full_covs$roughness) + mean(full_covs$roughness) #Use the mean and sd of original value to change label name\naxis(1, at=xticks, labels=round(xlabs, 1))\nlines(lower~roughness, pred_det,type=\"l\",col=gray(0.5))\nlines(upper~roughness, pred_det,type=\"l\",col=gray(0.5))"
+  },
+  {
+    "objectID": "parte2.html#plot-ocupación-en-escala-original",
+    "href": "parte2.html#plot-ocupación-en-escala-original",
+    "title": "parte2",
+    "section": "Plot Ocupación en escala original",
+    "text": "Plot Ocupación en escala original\n\npred_psi &lt;-predict(mf7, type=\"state\", newdata=newdat_range, appendData=TRUE) \n\n\n###  Plot occupancy en escala original\nplot(Predicted ~ elevation, pred_psi, type=\"l\", ylim=c(0,1), col=\"blue\",\n     xlab=\"Elevation\",\n     ylab=\"Occupancy Probability\",\n     xaxt=\"n\")\nxticks &lt;- c(-1, -0.5, 0, 0.5, 1, 1.5, 2)  # -1:2\nxlabs &lt;- xticks*sd(full_covs$elevation) + mean(full_covs$elevation) #Use the mean and sd of original value to change label name\naxis(1, at=xticks, labels=round(xlabs, 1))\nlines(lower ~ elevation, pred_psi, type=\"l\", col=gray(0.5))\nlines(upper ~ elevation, pred_psi, type=\"l\", col=gray(0.5))"
+  },
+  {
+    "objectID": "parte2.html#modelo-espacialmente-explícito",
+    "href": "parte2.html#modelo-espacialmente-explícito",
+    "title": "parte2",
+    "section": "Modelo espacialmente explícito",
+    "text": "Modelo espacialmente explícito\n\npredict\n\nlibrary(RColorBrewer)\n\nsrtm_crop_s &lt;- rast(list(scale(elevation), \n                     scale(roughness))) # scale altitud\nnames(srtm_crop_s) &lt;- c(\"elevation\", \"roughness\")\n# crs(srtm_crop_s) &lt;- \"+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0\"\n\npred_p_s &lt;-predict(mf7, type=\"det\", newdata=srtm_crop_s) \npred_psi_s &lt;-predict(mf7, type=\"state\", newdata=srtm_crop_s) \n\n\n\nPlot\n\nconvert to original scale\n\npred_p_r &lt;- pred_p_s * sd(full_covs$roughness) + mean(full_covs$roughness)\n\n\npred_psi_r &lt;- pred_psi_s * sd(full_covs$roughness) + mean(full_covs$roughness)\n\n\n# w &lt;- project(pred_p_r, \"EPSG:32618\")\n# clr &lt;- colorRampPalette(brewer.pal(9, \"YlGn\"))\n\n\n\nDetection\n\nmapview (pred_p_r[[1]])\n\n\n\n\n\n\n\nOccupancy\n\nmapview (pred_psi_r[[1]])"
+  },
+  {
+    "objectID": "about.html#instructor",
+    "href": "about.html#instructor",
+    "title": "About",
+    "section": "",
+    "text": "Diego J. Lizcano, Ph.D.. Wildlife Conservation Society (WCS) y Sociedad Colombiana de Mastozoología (SCMas)"
+  },
+  {
+    "objectID": "about.html#material-de-apoyo-adicional",
+    "href": "about.html#material-de-apoyo-adicional",
+    "title": "About",
+    "section": "Material de apoyo adicional:",
+    "text": "Material de apoyo adicional:\nAndrade-Ponce, G., Cepeda-Duque, J. C., Mandujano, S., Velásquez-C, K. L., Lizcano, D. J., & Gómez-Valencia, B. (2021). Modelos de ocupación para datos de cámaras trampa. Mammalogy Notes, 7(1), 200. https://doi.org/10.47603/mano.v7n1.200\nLizcano DJ. 2020. Simulación y análisis de ocupación. Entendiendo las simulaciones y el modelo básico de ocupación. Versión 1. http://doi.org/10.5281/zenodo.4028019"
   }
 ]
