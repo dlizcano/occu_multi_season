@@ -3,13 +3,15 @@ title: "parte1"
 description: | 
   Repaso del concepto de ocupación. 
 author: 
-  - name: Diego J. Lizcano
-    orcid: https://orcid.org/0000-0002-9648-0576
-date: 24/06/2025
+  - name: Diego Lizcano
+    orcid: 0000-0002-9648-0576
+date: 2025/06/24
 citation: 
   url: https://dlizcano.github.io/occu_multi_season/
-  title: "El concepto de ocupación"
+  title: "Modelado de la Ocupación, abundancia y densidad de poblaciones: enfoque frecuentista y bayesiano en R. Modelo de ocupación de multiples temporadas"
 google-scholar: true
+bibliography: grateful-refs.bib
+license: CC BY-SA
 html_document:
     toc: true
     toc_float: true
@@ -61,7 +63,7 @@ El problema de contar organismos en ecología, censos, muestreos, poblaciones y 
 
 # Presentación 
 
-[![image](img/Occu_Bayes.png](https://dlizcano.github.io/occu_multi_season/ocupacion.html)
+[![click para comenzar](https://dlizcano.github.io/occu_multi_season/img/Occu_Bayes.png)](https://dlizcano.github.io/occu_multi_season/ocupacion.html)
 
 
 ## Package Citation

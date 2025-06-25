@@ -2,20 +2,22 @@
 title: "About"
 description: |
   Instructores y creditos del curso: Modelado de la Ocupación, abundancia y densidad de poblaciones: enfoque frecuentista y bayesiano en R.
-date: 04/12/2024
+date: 24/06/2025
 author: 
-  - name: Diego J. Lizcano
-    orcid: https://orcid.org/0000-0002-9648-0576
+  - name: Diego Lizcano
+    orcid: 0000-0002-9648-0576
     affiliation: WCS-SCMas
     affiliation-url: https://mamiferoscolombia.org/
   - name: Salvador Mandujano
-    orcid: https://orcid.org/0000-0002-8958-385X
+    orcid: 0000-0002-8958-385X
     affiliation: INECOL
     affiliation-url: https://perfiles.inecol.mx/index.php/home/vertebrados/salvador-mandujano-rodriguez/
 citation: 
   url: https://dlizcano.github.io/occu_multi_season/
-  title: "Introducción al procesamiento, visualización y análisis de datos espaciales en R"
+  title: "Modelado de la Ocupación, abundancia y densidad de poblaciones: enfoque frecuentista y bayesiano en R. Modelo de ocupación de multiples temporadas"
 google-scholar: true
+bibliography: grateful-refs.bib
+license: CC BY-SA
 ---
 
 ```{r setup, include=FALSE}
@@ -24,7 +26,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Instructor
 
-[Diego J. Lizcano, Ph.D.](http://dlizcano.github.io/) Wildlife Conservation Society (WCS) y Sociedad Colombiana de Mastozoología (SCMas)
+[Diego J. Lizcano, Ph.D.](http://dlizcano.github.io/)  Wildlife Conservation Society (WCS) y Sociedad Colombiana de Mastozoología (SCMas)
 
 
 ## Créditos
@@ -33,13 +35,16 @@ Este mini curso es una parte del curso: Introducción al procesamiento, visualiz
 
 Con este curso pretendemos presentar una introducción a los conceptos de monitoreo de biodiversidad usando modelos de ocupación, con estimadores de máxima verosimilitud y bayesianos.
 
-Algunos ejercicios presentados en este curso fueron adaptados del curso taller: [Simulación y análisis de ocupación. Entendiendo las simulaciones y el modelo básico de ocupación](https://dlizcano.github.io/IntroOccuBook/).  
+Algunos ejercicios presentados en este curso fueron adaptados del taller - tutorial: [Simulación y análisis de ocupación. Entendiendo las simulaciones y el modelo básico de ocupación](https://dlizcano.github.io/IntroOccuBook/).  
 
 ## Material de apoyo adicional:
 
-Andrade-Ponce, G., Cepeda-Duque, J. C., Mandujano, S., Velásquez-C, K. L., Lizcano, D. J., & Gómez-Valencia, B. (2021). Modelos de ocupación para datos de cámaras trampa. Mammalogy Notes, 7(1), 200. https://doi.org/10.47603/mano.v7n1.200
+Andrade-Ponce, G., Cepeda-Duque, J. C., Mandujano, S., Velásquez-C, K. L., Lizcano, D. J., & Gómez-Valencia, B. (2021). Modelos de ocupación para datos de cámaras trampa. Mammalogy Notes, 7(1), 200. [https://doi.org/10.47603/mano.v7n1.200](https://doi.org/10.47603/mano.v7n1.200)
 
-Lizcano DJ. 2020. Simulación y análisis de ocupación. Entendiendo las simulaciones y el modelo básico de ocupación. Versión 1. http://doi.org/10.5281/zenodo.4028019
+Lizcano DJ. 2020. Simulación y análisis de ocupación. Entendiendo las simulaciones y el modelo básico de ocupación. Versión 1. [http://doi.org/10.5281/zenodo.4028019](http://doi.org/10.5281/zenodo.4028019)
+
+Lizcano, D. J. (2018). Trampas cámara como herramienta para estudiar mamíferos silvestres. Mammalogy Notes, 5(1), 31-35. [https://doi.org/10.47603/manovol5n1.31-35](https://doi.org/10.47603/manovol5n1.31-35])
+
 
 
 
