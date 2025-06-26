@@ -25,6 +25,12 @@ website:
       - icon: github
         href: https://github.com/dlizcano/occu_multi_season
         aria-label: GitHub
+  comments:
+    giscus:
+      repo: dlizcano/occu_multi_season
+      theme:
+        light: light # giscus theme used for light website theme
+        dark: dark_dimmed # giscus theme used for dark website theme
 
 format:
   html:
