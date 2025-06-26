@@ -8,9 +8,9 @@
 
 <meta name="author" content="Diego Lizcano">
 <meta name="dcterms.date" content="2025-06-24">
-<meta name="description" content="Repaso del concepto de ocupación.">
+<meta name="description" content="Repaso del concepto de ocupación y las matemáticas detras del modelo">
 
-<title>parte1 – Modelado de la Ocupación, abundancia y densidad de poblaciones</title>
+<title>Repaso del concepto de ocupación – Modelado de la Ocupación, abundancia y densidad de poblaciones</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -128,8 +128,8 @@ div.csl-indent {
 
 
 <link rel="stylesheet" href="styles.css">
-<meta name="twitter:title" content="Modelado de la Ocupación, abundancia y densidad de poblaciones - parte1">
-<meta name="twitter:description" content="Repaso del concepto de ocupación.">
+<meta name="twitter:title" content="Modelado de la Ocupación, abundancia y densidad de poblaciones - Repaso del concepto de ocupación">
+<meta name="twitter:description" content="Repaso del concepto de ocupación y las matemáticas detras del modelo">
 <meta name="twitter:image" content="https://dlizcano.github.io/occu_multi_season/data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg==">
 <meta name="twitter:creator" content="@dlizcano">
 <meta name="twitter:site" content="https://github.com/dlizcano/occu_multi_season">
@@ -218,11 +218,9 @@ div.csl-indent {
   <li><a href="#prerrequisitos" id="toc-prerrequisitos" class="nav-link" data-scroll-target="#prerrequisitos">Prerrequisitos</a></li>
   <li><a href="#introducción-teórico-1-horas" id="toc-introducción-teórico-1-horas" class="nav-link" data-scroll-target="#introducción-teórico-1-horas">Introducción (Teórico, 1 horas)</a></li>
   </ul></li>
-  <li><a href="#presentación" id="toc-presentación" class="nav-link" data-scroll-target="#presentación">Presentación</a>
-  <ul class="collapse">
+  <li><a href="#presentación" id="toc-presentación" class="nav-link" data-scroll-target="#presentación">Presentación</a></li>
   <li><a href="#package-citation" id="toc-package-citation" class="nav-link" data-scroll-target="#package-citation">Package Citation</a></li>
   <li><a href="#sesion-info" id="toc-sesion-info" class="nav-link" data-scroll-target="#sesion-info">Sesion info</a></li>
-  </ul></li>
   </ul>
 </nav>
     </div>
@@ -231,12 +229,12 @@ div.csl-indent {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">parte1</h1>
+<h1 class="title">Repaso del concepto de ocupación</h1>
 </div>
 
 <div>
   <div class="description">
-    <p>Repaso del concepto de ocupación.</p>
+    <p>Repaso del concepto de ocupación y las matemáticas detras del modelo</p>
   </div>
 </div>
 
@@ -300,8 +298,9 @@ div.csl-indent {
 <figcaption>click para comenzar</figcaption>
 </figure>
 </div>
-<section id="package-citation" class="level2">
-<h2 class="anchored" data-anchor-id="package-citation">Package Citation</h2>
+</section>
+<section id="package-citation" class="level1">
+<h1>Package Citation</h1>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -314,8 +313,8 @@ div.csl-indent {
 </div>
 </div>
 </section>
-<section id="sesion-info" class="level2">
-<h2 class="anchored" data-anchor-id="sesion-info">Sesion info</h2>
+<section id="sesion-info" class="level1">
+<h1>Sesion info</h1>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -357,7 +356,6 @@ loaded via a namespace (and not attached):
 
 
 
-</section>
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">

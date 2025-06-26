@@ -1,7 +1,7 @@
 ---
-title: "parte2"
+title: "Repaso de los modelos de ocupación de una temporada"
 description: | 
-  Repaso del modelo de ocupación. Practica
+  Modelo de ocupación espacialmente explicito. Practica con datos reales
 author: 
   - name: Diego Lizcano
     orcid: 0000-0002-9648-0576
@@ -27,16 +27,18 @@ html_document:
 # Usando datos reales
 
 ::: {.callout-tip title="Los datos que vamos a usar provienen del articulo:"}
-Elevation as an occupancy determinant of the little red brocket deer (_Mazama rufina_) in the Central Andes of Colombia. [https://doi.org/10.15446/caldasia.v43n2.85449](https://doi.org/10.15446/caldasia.v43n2.85449)
+Elevation as an occupancy determinant of the little red brocket deer (_Mazama rufina_) in the Central Andes of Colombia. Caldasia, 43(2), 392-395. [https://doi.org/10.15446/caldasia.v43n2.85449](https://doi.org/10.15446/caldasia.v43n2.85449)
 :::
 
 
 ## Modelando la ocupacion de un venado andino
 
+Instalamos 28 cámaras trampa entre marzo y junio de 2017 en la localidad de Quindío, donde permanecieron activas durante 35 días. En Risaralda, instalamos 60 cámaras en dos conjuntos entre marzo y julio de 2017. Estas últimas permanecieron activas durante 45 días. Instalamos todas las cámaras trampa a una distancia mínima de 500 m entre sí, en una cuadrícula regular.
+
 Acá evaluamos la influencia de variables del terreno sobre la ocupación del venado soche (_Mazama rufina_) en los Andes centrales de Colombia. La ocupación aumentó con la elevación hasta los 3000 m y por encima de este valor decrece. Esta información es crucial para predecir los posibles efectos del cambio climático sobre _M. rufina_ y otras especies de montaña.
 
 
-Comenzamos cargando tres paquetes básicos necesarios para generar mapas; `mapview`, `sf` y  luego  `readr` para leer los datos y `unmarked` para los modelos de ocupación.
+Comenzamos cargando tres paquetes básicos necesarios para generar mapas; `mapview`, `sf`, luego cargamos `readr` para leer los datos y `unmarked` para los modelos de ocupación.
 
 ```{r}
 #| echo: false
@@ -176,7 +178,12 @@ datatable(full_covs_s) #scaled
 # Ocupación 
 
 ## objeto umf
+Creamos un cobjeto que elaza los datos y las covariables para el paquete unmarked. 
+
 ```{r}
+#| code-fold: true
+#| warning: false
+#| 
 #############
 # Occu analisys
 
@@ -189,6 +196,8 @@ plot(umf_y_full)
 
 ## Posibles modelos
 ```{r}
+#| code-fold: true
+#| warning: false
 # build  models
 mf0<-occu(~1 ~ 1, umf_y_full)
 mf1<-occu(~1 ~ elevation, umf_y_full)
@@ -220,7 +229,9 @@ modSel(fms1)
 ## Bondad de ajuste
 
 ```{r}
-# print(fms1)
+#| code-fold: true
+#| warning: false
+
 
 pb_f <- parboot(mf8, nsim=500, report=10) 
 ```
@@ -230,6 +241,8 @@ pb_f <- parboot(mf8, nsim=500, report=10)
 Primero creamos un set de dados nuevos con el rango de todas las covariables y luego lo usamos para predecir.
 
 ```{r}
+#| code-fold: true
+#| warning: false
 #
 newdat_range<-data.frame(elevation=seq(min(full_covs_s$elevation),
                                        max(full_covs_s$elevation),length=100), 
@@ -246,7 +259,7 @@ pred_det <-predict(mf8, type="det", newdata=newdat_range, appendData=TRUE)
 ## plot Detection en escala original
 pred_det <-predict(mf8, type="det", newdata=newdat_range, appendData=TRUE)
 plot(Predicted~roughness, pred_det,type="l",col="blue", 
-     xlab="Roughness",
+     xlab="slope",
      ylab="Detection Probability",
      xaxt="n")
 xticks <- c(-1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3) # -1:2
@@ -256,8 +269,12 @@ lines(lower~roughness, pred_det,type="l",col=gray(0.5))
 lines(upper~roughness, pred_det,type="l",col=gray(0.5))
 ```
 
-##  Plot Ocupación en escala original
+##  Plot ocupación en escala original
+
 ```{r}
+#| code-fold: true
+#| warning: false
+#| 
 pred_psi <-predict(mf8, type="state", newdata=newdat_range, appendData=TRUE) 
 
 
@@ -277,11 +294,13 @@ lines(upper ~ elevation, pred_psi, type="l", col=gray(0.5))
 
 ### Predicción espacial
 
-aca usamos el raster para prededir con el mejor modelo.
+Acá usamos el raster para prededir con el mejor modelo.
 
 ```{r}
-library(RColorBrewer)
+#| code-fold: true
+#| warning: false
 
+# new raster data set
 srtm_crop_s <- rast(list(scale(elevation), 
                          scale(slope),
                          scale(roughness)
@@ -289,6 +308,7 @@ srtm_crop_s <- rast(list(scale(elevation),
 names(srtm_crop_s) <- c("elevation", "slope", "roughness") # put names
 # crs(srtm_crop_s) <- "+proj=longlat +datum=WGS84 +ellps=WGS84 +towgs84=0,0,0"
 
+# spatial predictions
 pred_p_s <-predict(mf8, type="det", newdata=srtm_crop_s) 
 pred_psi_s <-predict(mf8, type="state", newdata=srtm_crop_s) 
 
@@ -302,6 +322,9 @@ pred_psi_s <-predict(mf8, type="state", newdata=srtm_crop_s)
 En éste caso, este paso no require la conversión. 
 
 ```{r}
+#| code-fold: true
+#| warning: false
+#| 
 pred_p_r <- pred_p_s # * sd(full_covs$roughness) + mean(full_covs$roughness)
 
 
@@ -318,14 +341,20 @@ pred_psi_r <- pred_psi_s # * sd(full_covs$roughness) + mean(full_covs$roughness)
 
 #### Detection
 ```{r}
-mapview (pred_p_r[[1]]) + cams_loc_QR_sf
+#| code-fold: true
+#| warning: false
+#| 
+mapview (pred_p_r[[1]], alpha=0.5) + mapview(cams_loc_QR_sf, cex = 1.5, color = "green")
 
 
 ```
 
 #### Occupancy
 ```{r}
-mapview (pred_psi_r[[1]]) + cams_loc_QR_sf
+#| code-fold: true
+#| warning: false
+#| 
+mapview (pred_psi_r[[1]], alpha=0.5) + mapview(cams_loc_QR_sf, cex = 1.5, color = "green")
 ```
 
 
@@ -348,16 +377,18 @@ Otra buena idea es buscar un grupo de apoyo local. El uso de R es una experienci
 
 ![](https://media.giphy.com/media/6heBQSjt2IoA8/giphy.gif)
 
-## Package Citation
+# Package Citation
 
 ```{r}
 #| code-fold: true
+#| warning: false
+#| 
 pkgs <- cite_packages(output = "paragraph", pkgs="Session", out.dir = ".")
 # knitr::kable(pkgs)
 pkgs
 ```
 
-## Sesion info
+# Sesion info
 
 ::: {.callout-note collapse="true"}
 ```{r}

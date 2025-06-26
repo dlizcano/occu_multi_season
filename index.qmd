@@ -35,10 +35,13 @@ format:
     fig-height: 6
 ---
 
-## Estructura del curso
+# Estructura del curso
 
-Este es un curso de 4 horas parte del curso Modelado de la Ocupación, abundancia y densidad de poblaciones: enfoque frecuentista y bayesiano en R.\
-[![imagen](img/cursoSalvador.jpg)](https://drive.google.com/file/d/1Y8SmvqlkfX6XP6dkvDigPxM-tU4npx-MuIPkR_hmAlo/view?fbclid=IwY2xjawLHQAVleHRuA2FlbQIxMABicmlkETF2OFJ2ckVudEtyUjJrWGZTAR5iCiJ_NK3WInIy93uotCKgW4K9oDYGklxwZnivqtJUO_BdhFWDW9EL4fcYWg_aem_8jZ7ErEUPZIXcd2ZRIVfDg)
+Este es un curso de 4 horas que hace parte del curso Modelado de la Ocupación, abundancia y densidad de poblaciones: enfoque frecuentista y bayesiano en R.\
+[![click para mas información](img/cursoSalvador.jpg)](https://drive.google.com/file/d/1Y8SmvqlkfX6XP6dkvDigPxM-tU4npx-MuIPkR_hmAlo/view?fbclid=IwY2xjawLHQAVleHRuA2FlbQIxMABicmlkETF2OFJ2ckVudEtyUjJrWGZTAR5iCiJ_NK3WInIy93uotCKgW4K9oDYGklxwZnivqtJUO_BdhFWDW9EL4fcYWg_aem_8jZ7ErEUPZIXcd2ZRIVfDg)
+
+Este es un curso bien completo coordinado por el Dr. Salvador Mandujano en el INECOL.
+
 
 ```{r}
 #| echo: false
@@ -47,21 +50,21 @@ library(grateful) # citation packages
 ```
 
 
-### Parte 1
+## Parte 1 (1 hora)
 
-Repaso del concepto de ocupación.
+Repaso del concepto de ocupación. Presentación. 
 
-### Parte 2 
+## Parte 2 (2 horas)
 
-Repaso de los modelos de ocupación de una temporada.
+Repaso de los modelos de ocupación de una temporada. Código. 
 
-### Parte 3
+## Parte 3 (1 hora)
 
-Modelo de ocupacion de multiples temporadas.
+Modelo de ocupación de multiples temporadas. Texto y Código. 
 
-### Requisitos
+## Requisitos
 
-Computador con acceso a Internet. Contar con R y RStudio previamente instalados. La instalación del programa no se explicará durante el curso.
+Computador con acceso a Internet. Contar con R y RStudio previamente instalados. La instalación de los programas y paquetes no se explicará durante el curso.
 
 Antes del curso instalar los paquetes:
 

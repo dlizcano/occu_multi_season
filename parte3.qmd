@@ -1,7 +1,7 @@
 ---
-title: "parte3"
+title: "Modelo de ocupacion de multiples temporadas"
 description: | 
-  Modelo de ocupación de multies temporadas
+  Modelo de ocupación de multies temporadas. Concepto y practica con datos simulados
 author: 
   - name: Diego Lizcano
     orcid: 0000-0002-9648-0576
@@ -56,24 +56,26 @@ Donde\
 β como el coeficiente de la regresión para las co-variables de la ocupación y\
 α el coeficiente de regresión para las co-variables de la detección.
 
-Si desean conocer en detalle el modelo estático y saber más del poder y potencial de las simulaciones en ecología, les recomiendo seguir el [Tutorial Ubicado en este enlace](https://dlizcano.github.io/IntroOccuBook/example.html).
+Si desean conocer en detalle el modelo estático y conocer más sobre poder y potencial de las simulaciones en ecología, les recomiendo seguir el [tutorial ubicado en este enlace](https://dlizcano.github.io/IntroOccuBook/).
 
 ## Recordemos la forma de la distribución Bernoulli!
 
-La distribución de Bernoulli (o distribución dicotómica), nombrada así por el matemático suizo Jacob Bernoulli (1655-1705).
+La distribución de Bernoulli, o distribución dicotómica, es nombrada así en honor al matemático suizo Jacob Bernoulli (1655-1705).
 
 ![](https://dlizcano.github.io/occu_multi_season/img/jacob_bernoulli.jpg)
 
 Esta es una distribución de probabilidad discreta, que toma valor 1 para la probabilidad de éxito (p) y valor 0 para la probabilidad de fracaso (q=1-p).
 
-La distribución de Bernoulli es un caso particular de la distribución binomial, pero con solo dos posibles resultados (éxito o fracaso) unos y ceros.
+La distribución de Bernoulli es un *caso particular de la distribución binomial*, pero con solo dos posibles resultados (éxito o fracaso) que equivalen a unos y ceros.
 
-> El proceso Bernoulli es el más simple proceso aleatorio que existe! Imagínemelo como algo tan sencillo como una secuencia de lanzamientos de una moneda. Donde un solo lanzamiento es un "trial" y muchos lanzamientos componen el proceso.
+> El proceso Bernoulli es el más simple proceso aleatorio que existe! Imagínemelo como algo tan sencillo como una secuencia de lanzamientos de una moneda. Donde un solo lanzamiento es un "trial" y muchos lanzamientos componen el proceso. Cada vez que lanzas la moneda solo hay dos opciones.
 
-Usemos el siguiente código ejecutándolo varias veces y cambiando los parámetros para entender su efecto en el resultado.
+Usemos el siguiente código ejecutándolo varias veces y cambiando los parámetros para entender el efecto del cambio del numero de datos y la probabilidad en el resultado.
 
-```{r fig.width=6, fig.height=6, fig.align='center'}
-
+```{r}
+#| code-fold: true
+#| warning: false
+#| 
 library(ggplot2)
 ni<-10 # numero de datos
 pi<- 0.5 # probabilidad (~proporcion de unos)
@@ -89,7 +91,7 @@ ggplot(daber, aes(x=estimado)) +
           color="blue", linetype="dashed", size=1) # media en azul
 ```
 
-Si desean conocer más detalles de la distribución Bernoulli les recomiendo la muy buena explicación de [jbstatistics](https://www.youtube.com/watch?v=bT1p5tJwn_0)
+Si desean conocer más detalles de la distribución Bernoulli les recomiendo ver la muy buena explicación de [jbstatistics](https://www.youtube.com/watch?v=bT1p5tJwn_0)
 
 {{< video https://www.youtube.com/watch?v=bT1p5tJwn_0
     title='Introduction to the Bernoulli Distribution' 
@@ -111,7 +113,13 @@ con sitio i durante el muestreo j
 
 logit(Ψi) = α0 + α1xi1 + . . . + αUxiU.
 
+
+
 logit(pij) = β0 + β1xi1 + . . . + βUxiU + βU+1yij1 + . . . + βU+V yijV.
+
+
+Donde ψ es la ocupación y p la probabilidad de detección. Con β como el coeficiente de la regresión para las co-variables de la ocupación y α el coeficiente de regresión para las co-variables de la detección.  
+
 
 ### Algebra del Modelo Dinámico
 
@@ -129,11 +137,19 @@ $z_{it} \sim Bernoulli (z_{i,t-1\phi it } + (1-z_{i,t-1}) \gamma_{i,t})$ Proceso
 
 $y_{ijt} \sim Bernoulli (z_{it} * p_{ijt})$ Proceso de Observación
 
+ 
+
 #### De forma Lineal
 
 logit(Ψi,1) = α0 + α1xi1 + . . . + αUxiU.
 
 Ψi,t\|zi,t−1 = zi,t−1 × (1 −$\epsilon_{i}$,t−1) + (1 − zi,t−1) × $\gamma_{i}$,t−1, for t \> 1.
+
+
+Con $\gamma_{i}$ como parametro de la colonización y $\epsilon_{i}$ como parametro de la extincion.
+
+Tenga en cuenta que colonización y extincion se refieren a los sitios (colonización y extincion local) y no al concepto de la biologia
+de la conservación. 
 
 ## La función Colext dentro del paquete unmarked
 
@@ -150,7 +166,9 @@ Luego, veremos cómo ajustar un modelo de ocupación dinámico con dependencia d
 Para simular los datos, ejecutamos el siguiente código R. Los valores reales para estos parámetros para cada año se extraen aleatoriamente de una distribución uniforme con los límites especificados.
 
 ```{r}
-
+#| code-fold: true
+#| warning: false
+#| 
 M <- 250 # Number of sites  
 J <- 3 # num secondary sample periods 
 T <- 10 # num primary sample periods  
@@ -194,7 +212,9 @@ for (k in 2:T){
 Hemos generado una sola realización del sistema estocástico así definido. La Figura 1 ilustra la cuestión fundamental de la detección imperfecta: la proporción real de sitios ocupados difiere mucho de la proporción observada de sitios ocupados, y debido a que p varía entre años, los datos observados no pueden usarse como un índice válido del parámetro de interés ψi.
 
 ```{r}
-
+#| code-fold: true
+#| warning: false
+#| 
 plot(1:T, colMeans(z), type = "b", xlab = "Year", ylab = "Proportion of sites occupied", col = "black", xlim=c(0.5, 10.5), 
       xaxp=c(1,10,9), ylim = c(0,0.6), 
       lwd = 2, lty = 1, frame.plot = FALSE, 
@@ -217,6 +237,9 @@ Para analizar este conjunto de datos con un modelo de ocupación dinámico sin m
 
 
 ```{r}
+#| code-fold: true
+#| warning: false
+#| 
 library(unmarked)
 yy <- matrix(y, M, J*T)
 year <- matrix(c('01','02','03','04','05','06','07','08','09','10'), 
@@ -229,7 +252,9 @@ year <- matrix(c('01','02','03','04','05','06','07','08','09','10'),
 Para organizar los datos en el formato requerido por colext, utilizamos la función unmarkedMultFrame. Los únicos argumentos requeridos son y, los datos de detección / no detección, y numPrimary, el número de estaciones. Los tres tipos de covariables descritos anteriormente también se pueden suministrar utilizando los argumentos siteCovs, annualSiteCovs y obsCovs. En este caso, solo usamos el segundo tipo, que debe tener M filas y T columnas.
 
 ```{r}
-
+#| code-fold: true
+#| warning: false
+#| 
 simUMF <- unmarkedMultFrame(y = yy, 
                             yearlySiteCovs = list(year = year), 
                             numPrimary=T)
@@ -245,7 +270,10 @@ summary(simUMF)
 Estamos listos para adaptar algunos modelos de ocupación dinámica. Ajustaremos un modelo con valores constantes para todos los parámetros (modelo nulo) y otro con dependencia total del tiempo para la probabilidad de colonización, extinción y detección. 
 
 ```{r}
- # Model with all constant parameters  
+#| code-fold: true
+#| warning: false
+#|  
+# Model with all constant parameters  
 m0 <- colext(psiformula= ~1, 
              gammaformula = ~ 1, 
              epsilonformula = ~ 1, 
@@ -265,6 +293,10 @@ Alternativamente, podemos usar backTransform, que calcula los errores estándar 
 
 
 ```{r}
+#| code-fold: true
+#| warning: false
+
+
 plogis(-0.813) 
 
 names(m0)  
@@ -272,16 +304,17 @@ backTransform(m0, type="psi")
 confint(backTransform(m0, type="psi"))  # intervalos
 
 
- 
 
 ```
 Luego  ajustamos el modelo de ocupación dinámica con dependencia total del año en los parámetros que describen la dinámica de ocupación y también en la detección. Este es el mismo modelo bajo el cual generamos el conjunto de datos, por lo que esperaríamos estimaciones precisas. 
 
-Por defecto en R, un factor como el año en este análisis, se parametriza en términos de una intersección y efectos que representan diferencias. Esto significaría que el parámetro para el primer año es la intersección y los efectos denotarían las diferencias entre los valores de los parámetros en todos los demás años, en relación con el valor del parámetro en el primer año, que sirve como nivel de referencia. Este tratamiento o la parametrización de los efectos es útil para evaluar las diferencias. Para una presentación simple, una parametrización de medias es más práctica. Se puede especificar agregando un -1 a la fórmula para los parámetros dependientes del tiempo
+Por defecto en R, un factor como el año en este análisis, se parametriza en términos de una intersección y efectos que representan diferencias. Esto significaría que el parámetro para el primer año es la intersección y los efectos denotarían las diferencias entre los valores de los parámetros en todos los demás años, en relación con el valor del parámetro en el primer año, que sirve como nivel de referencia. Este tratamiento o la parametrización de los efectos es útil para evaluar las diferencias. Para una presentación simple, una parametrización de medias es más práctica. Se puede especificar agregando un -1 a la fórmula para los parámetros dependientes del tiempo.
 
 
 ```{r}
-
+#| code-fold: true
+#| warning: false
+#| 
  m1 <- colext(psiformula = ~1, # First-year occupancy 
               gammaformula = ~ year-1, # Colonization 
               epsilonformula = ~ year-1, # Extinction 
@@ -298,7 +331,9 @@ m1
 ## Selección de Modelos
 
 ```{r}
-  
+#| code-fold: true
+#| warning: false
+#| 
 models <- fitList(
     'psi(.)gam(.)eps(.)p(.)' = m0,
     'psi(.)gam(year)eps(year)p(year)' = m1
@@ -320,7 +355,9 @@ Predict es mas versatil y devuelve las predicciones junto con errores estándar 
 
 
 ```{r}
-
+#| code-fold: true
+#| warning: false
+#| 
 # Crear nuevo data frame
 nd <- data.frame(year=c('01','02','03','04','05','06','07','08','09'))
 # predecir
@@ -377,10 +414,13 @@ with(E.det, { # Plot for detection probability: note 10 years
 ## Probando la bondad del ajuste del modelo
 
 
-Además de estimar la varianza de una estimación, la rutina de bootstrap paramétrica se puede usar para evaluar la bondad del ajuste. Para este propósito, una estadística de ajuste, es decir, una que compara los valores observados y esperados se evalúan utilizando el modelo ajustado original y muchos otros modelos ajustados a conjuntos de datos simulados. La simulación produce una aproximación de la distribución de la estadística de ajuste, y un valor P puede calcularse como la proporción de valores simulados mayor que el valor observado. Hosmer y col. (1997) encontraron que un estadístico χ2 funcionó razonablemente bien al evaluar la falta de ajuste para los modelos de regresión logística. No conocemos estudios que evalúen formalmente el desempeño de varias estadísticas de ajuste para modelos de ocupación dinámica, por lo que este enfoque debe considerarse experimental. Las estadísticas de ajuste aplicadas a los historiales de encuentros agregados ofrecen un enfoque alternativo (MacKenzie y Bailey 2004), pero son difíciles de implementar cuando J * T es alto y hay valores faltantes o covariables continuas.
+Además de estimar la varianza de una estimación, la rutina de bootstrap paramétrica se puede usar para evaluar la bondad del ajuste. Para este propósito, una estadística de ajuste, es decir, una que compara los valores observados y esperados se evalúan utilizando el modelo ajustado original y muchos otros modelos ajustados a conjuntos de datos simulados. La simulación produce una aproximación de la distribución de la estadística de ajuste, y un valor P puede calcularse como la proporción de valores simulados mayor que el valor observado. Hosmer et al. (1997) encontraron que un estadístico χ2 funcionó razonablemente bien al evaluar la falta de ajuste para los modelos de regresión logística. No conocemos estudios que evalúen formalmente el desempeño de varias estadísticas de ajuste para modelos de ocupación dinámica, por lo que este enfoque debe considerarse experimental. Las estadísticas de ajuste aplicadas a los historiales de encuentros agregados ofrecen un enfoque alternativo (MacKenzie y Bailey 2004), pero son difíciles de implementar cuando J * T es alto y hay valores faltantes o covariables continuas.
 
 
 ```{r}
+#| code-fold: true
+#| warning: false
+#| 
  chisq <- function(fm) { 
    umf <- getData(fm) 
    y <- getY(umf) 
@@ -393,25 +433,41 @@ Además de estimar la varianza de una estimación, la rutina de bootstrap param�
  }
 
 set.seed(344) 
-pb.gof <- parboot(m0, statistic=chisq, nsim=100)
+pb.gof <- parboot(m0, statistic=chisq, nsim=50)
 plot(pb.gof) 
 
 
 ```
 
-La figura indica que, como se esperaba, el modelo de parámetro constante no se ajusta bien a los datos.
+La figura con la linea punteada fuera del histograma indica que, como se esperaba, el modelo nulo de parámetros constantes no se ajusta bien a los datos.
+
+Probemos ahora con el modelo m1 con la colonización, extinción y probabilidad de detección variando con los años, el cual tiene los parametros: 'psi(.)gam(year)eps(year)p(year)'.
+
+
+```{r}
+#| code-fold: true
+#| warning: false
+pb.gof1 <- parboot(m1, statistic=chisq, nsim=50)
+plot(pb.gof1)
+```
+
+Este modelo tiene un mejor ajuste y podria servir para predecir. 
 
 # Modelo de Ocupación Dinámico con datos del mundo real
 
-En un analisis de los datos de la red de monitoreo TEAM usamos un modelo de ocupación dinámico.
+En un análisis de los datos de la red de monitoreo TEAM en el cual usamos un modelo de ocupación dinámico.
 
-[Ahumada JA, Hurtado J, Lizcano D. 2013. Monitoring the Status and Trends of Tropical Forest Terrestrial Vertebrate Communities from Camera Trap Data: A Tool for Conservation. PLoS ONE. 8:e73707. doi:DOI: 10.1371/journal.pone.0073707.](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0073707)
+[Ahumada JA, Hurtado J, Lizcano D. 2013. Monitoring the Status and Trends of Tropical Forest Terrestrial Vertebrate Communities from Camera Trap Data: A Tool for Conservation. PLoS ONE. 8:e73707. https://doi.org/10.1371/journal.pone.0073707.](https://doi.org/10.1371/journal.pone.0073707)
 
-Utilizamos datos de trampa de cámara que la Red de Tropical Ecology Assessment and Monitoring (TEAM), recolectados de forma regular (en los mismos sitios) a lo largo de un transecto del Volcán Barva en Costa Rica, durante 5 años.
+![](https://dlizcano.github.io/occu_multi_season/img/AhumadaPlos.jpg)
+
+
+
+Utilizamos los datos de trampa de cámara, que la Red de Tropical Ecology Assessment and Monitoring (TEAM), recolectó de forma regular (en los mismos sitios) a lo largo de un transecto del Volcán Barva en Costa Rica, durante 5 años.
 
 Mostramos cómo estos datos pueden usarse para calcular los indicadores temporales de las especies de mamíferos de interés en el área.
 
-Se encontraron descensos en la ocupación de algunas especies de mamiferos medianos.
+Se encontraron descensos en la ocupación de algunas especies de mamíferos medianos.
 
 
 # Conclusión
@@ -434,16 +490,18 @@ Otra buena idea es buscar un grupo de apoyo local. El uso de R es una experienci
 ![](https://media.giphy.com/media/6heBQSjt2IoA8/giphy.gif)
 
 
-## Package Citation
+# Package Citation
 
 ```{r}
 #| code-fold: true
+#| warning: false
+#| 
 pkgs <- cite_packages(output = "paragraph", pkgs="Session", out.dir = ".")
 # knitr::kable(pkgs)
 pkgs
 ```
 
-## Sesion info
+# Sesion info
 
 ::: {.callout-note collapse="true"}
 ```{r}

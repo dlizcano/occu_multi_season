@@ -1,7 +1,7 @@
 ---
-title: "parte1"
+title: "Repaso del concepto de ocupación"
 description: | 
-  Repaso del concepto de ocupación. 
+  Repaso del concepto de ocupación y las matemáticas detras del modelo
 author: 
   - name: Diego Lizcano
     orcid: 0000-0002-9648-0576
@@ -66,7 +66,7 @@ El problema de contar organismos en ecología, censos, muestreos, poblaciones y 
 [![click para comenzar](https://dlizcano.github.io/occu_multi_season/img/Occu_Bayes.png)](https://dlizcano.github.io/occu_multi_season/ocupacion.html)
 
 
-## Package Citation
+# Package Citation
 
 ```{r}
 #| code-fold: true
@@ -75,7 +75,7 @@ pkgs <- cite_packages(output = "paragraph", pkgs="Session", out.dir = ".")
 pkgs
 ```
 
-## Sesion info
+# Sesion info
 
 ::: {.callout-note collapse="true"}
 ```{r}
